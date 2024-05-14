@@ -1,0 +1,30 @@
+import Header from './components/common/Header';
+import Switcher from './components/common/Switcher';
+import Sidebar from './components/common/Sidebar';
+import BackOnTop from './components/common/BackOnTop';
+import AllRoutes from './routes/AllRoutes';
+
+const App = (): JSX.Element => {
+  return (
+    <>
+      <div className="wrapper">
+        {/*  Top header */}
+        <Header />
+
+        {/* Switcher */}
+        <Switcher />
+
+        {/* Sidebar */}
+        <Sidebar />
+
+        {/* AllRoutes */}
+        <AllRoutes />
+
+        {/* Back To Top Button */}
+        <BackOnTop />
+      </div>
+    </>
+  );
+};
+
+export default App;

@@ -1,0 +1,61 @@
+{
+  "name": "admin",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@react-jvectormap/core": "^1.0.4",
+    "@react-jvectormap/world": "^1.1.2",
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "@types/jest": "^27.5.2",
+    "@types/node": "^16.18.97",
+    "@types/react": "^18.3.2",
+    "@types/react-dom": "^18.3.0",
+    "apexcharts": "^3.49.1",
+    "bootstrap": "^5.3.3",
+    "chart.js": "^4.4.2",
+    "jquery": "^3.7.1",
+    "metismenu": "^3.0.7",
+    "pace-js": "^1.2.4",
+    "perfect-scrollbar": "^1.5.5",
+    "react": "^18.3.1",
+    "react-apexcharts": "^1.4.1",
+    "react-dom": "^18.3.1",
+    "react-jvectormap": "^0.0.16",
+    "react-router-dom": "^6.23.1",
+    "react-scripts": "5.0.1",
+    "simplebar": "^6.2.6",
+    "typescript": "^4.9.5",
+    "web-vitals": "^2.1.4"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@types/bootstrap": "^5.2.10",
+    "@types/jquery": "^3.5.30"
+  }
+}
