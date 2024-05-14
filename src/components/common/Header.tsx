@@ -1,6 +1,24 @@
+import PerfectScrollbar from 'perfect-scrollbar';
+import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 
 const Header = (): JSX.Element => {
+    const chatRef = useRef(null);
+    const notiRef = useRef(null);
+
+    useEffect(() => {
+        const chatContainer = chatRef.current;
+        if (chatContainer) {
+            new PerfectScrollbar(chatContainer);
+        }
+    }, []);
+    useEffect(() => {
+        const notiContainer = notiRef.current;
+        if (notiContainer) {
+            new PerfectScrollbar(notiContainer);
+        }
+    }, []);
+
     return (
         <>
             {/* <!--start top header--> */}
@@ -137,7 +155,7 @@ const Header = (): JSX.Element => {
                                     <div className="p-2 border-bottom m-2">
                                         <h5 className="h5 mb-0">Messages</h5>
                                     </div>
-                                    <div className="header-message-list p-2">
+                                    <div className="header-message-list p-2" ref={chatRef}>
                                         <Link className="dropdown-item" to="#">
                                             <div className="d-flex align-items-center">
                                                 <img src="/assets/images/avatars/avatar-1.png" alt="" className="rounded-circle" width="50"
@@ -268,7 +286,7 @@ const Header = (): JSX.Element => {
                                     <div className="p-2 border-bottom m-2">
                                         <h5 className="h5 mb-0">Notifications</h5>
                                     </div>
-                                    <div className="header-notifications-list p-2">
+                                    <div className="header-notifications-list p-2" ref={notiRef}>
                                         <Link className="dropdown-item" to="#">
                                             <div className="d-flex align-items-center">
                                                 <div className="notification-box bg-light-primary text-primary"><i className="bi bi-basket2-fill"></i>
