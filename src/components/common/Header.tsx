@@ -1,8 +1,9 @@
 import { Link } from 'react-router-dom';
-import BoxDropDown from './headerItems/BoxDropDown';
-import MessageDropdown from './headerItems/MessageDropdown';
-import NotiDropdown from './headerItems/NotiDropdown';
 import UserDropdown from './headerItems/UserDropdown';
+// import BoxDropDown from './headerItems/BoxDropDown';
+// import MessageDropdown from './headerItems/MessageDropdown';
+// import NotiDropdown from './headerItems/NotiDropdown';
+// import SearchBar from './headerItems/SearchBar';
 
 const Header = (): JSX.Element => {
 
@@ -14,11 +15,10 @@ const Header = (): JSX.Element => {
                     <div className="mobile-toggle-icon fs-3">
                         <i className="bi bi-list"></i>
                     </div>
-                    <form className="searchbar">
-                        <div className="position-absolute top-50 translate-middle-y search-icon ms-3"><i className="bi bi-search"></i></div>
-                        <input className="form-control" type="text" placeholder="Type here to search" />
-                        <div className="position-absolute top-50 translate-middle-y search-close-icon"><i className="bi bi-x-lg"></i></div>
-                    </form>
+
+                    {/* Searchbar */}
+                    {/* <SearchBar /> */}
+
                     <div className="top-navbar-right ms-auto">
                         <ul className="navbar-nav align-items-center">
                             <li className="nav-item search-toggle-icon">
@@ -30,13 +30,13 @@ const Header = (): JSX.Element => {
                             </li>
 
                             {/* Dropdown Large */}
-                            <BoxDropDown />
+                            {/* <BoxDropDown /> */}
 
                             {/* Message Drop down */}
-                            <MessageDropdown />
+                            {/* <MessageDropdown /> */}
 
                             {/* Notification Drop down */}
-                            <NotiDropdown />
+                            {/* <NotiDropdown /> */}
 
                             {/* User Drop down */}
                             <UserDropdown />

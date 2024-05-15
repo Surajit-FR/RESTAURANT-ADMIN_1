@@ -19,10 +19,10 @@ const UserDropdown = (): JSX.Element => {
     // Define an array of dropdown items
     const dropdownItems: Array<dropdownItemsType> = [
         { icon: "bi bi-person-fill", text: "Profile", link: "/user/profile" },
-        { icon: "bi bi-gear-fill", text: "Setting", link: "#" },
+        // { icon: "bi bi-gear-fill", text: "Setting", link: "#" },
         { icon: "bi bi-speedometer", text: "Dashboard", link: "/dashboard" },
-        { icon: "bi bi-piggy-bank-fill", text: "Earnings", link: "#" },
-        { icon: "bi bi-cloud-arrow-down-fill", text: "Downloads", link: "#" }
+        // { icon: "bi bi-piggy-bank-fill", text: "Earnings", link: "#" },
+        // { icon: "bi bi-cloud-arrow-down-fill", text: "Downloads", link: "#" }
     ];
 
     // console.log(_USER_DATA);
