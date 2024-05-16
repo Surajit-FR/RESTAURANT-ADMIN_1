@@ -25,31 +25,32 @@ const Sidebar = (): JSX.Element => {
                         </Link>
                     </li>
                     {/* Products */}
-                    <li className="menu-label">Product</li>
+                    <li className="menu-label">Manage Product</li>
                     <li>
-                        <Link to="/all/products">
-                            <div className="parent-icon">
-                                <i className="bi bi-grid-fill"></i>
-                            </div>
-                            <div className="menu-title">All Priducts</div>
-                        </Link>
-                    </li>
-                    <li>
-                        <Link to="/add/product">
+                        <Link to="#" className="has-arrow">
                             <div className="parent-icon"><i className="bi bi-basket2-fill"></i>
                             </div>
-                            <div className="menu-title">Add Product</div>
+                            <div className="menu-title">Product & Category</div>
                         </Link>
+                        <ul>
+                            <li>
+                                <Link to="/products"><i className="bi bi-circle"></i>Products</Link>
+                            </li>
+                            <li>
+                                <Link to="/product/categories"><i className="bi bi-circle"></i>Categories</Link>
+                            </li>
+                        </ul>
                     </li>
 
-                    <li className="menu-label">Pricing</li>
+                    {/* Pricing */}
+                    {/* <li className="menu-label">Pricing</li>
                     <li>
                         <Link to="/manage/pricing">
                             <div className="parent-icon"><i className="bi bi-tags-fill"></i>
                             </div>
                             <div className="menu-title">Pricing Tables</div>
                         </Link>
-                    </li>
+                    </li> */}
                 </ul>
                 {/* <!--end navigation--> */}
             </aside>

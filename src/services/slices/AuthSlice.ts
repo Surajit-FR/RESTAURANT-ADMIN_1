@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { LOGIN } from "../api/Api";
 import { LoginSuccessResponse, UserAuth_Props } from "../../config/DataTypes.config";
-import { EncryptData } from "../../util/EncryptDecrypt";
+import { EncryptData } from "../../helper/EncryptDecrypt";
 import Cookies from 'js-cookie';
 
 export const loginUser = createAsyncThunk("/api/login", async ({ data, navigate }: UserAuth_Props, { rejectWithValue }): Promise<LoginSuccessResponse | any> => {

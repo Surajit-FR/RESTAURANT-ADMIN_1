@@ -1,4 +1,30 @@
+// Header type
+export type CustomHeadersType = {
+    headers: {
+        Authorization: string
+    }
+}
+
 // Form input type
+export type formValuesType = {
+    category_name?: string;
+    category_desc?: string;
+};
+
+// Form value props type
+export type FormValues_Props = {
+    data?: formValuesType | undefined;
+    header?: CustomHeadersType | undefined;
+    navigate?: any;
+};
+
+// Add category success resp type
+export type AddCategorySuccessResponse = {
+    message: string;
+    success: boolean;
+};
+
+// Signin input type
 export type signinInputValues = {
     credential?: string;
     password?: string;
@@ -60,4 +86,29 @@ export type dropdownItemsType = {
     icon: string;
     text: string;
     link: string;
+};
+
+// Define the pagination type
+export type Pagination_Type = {
+    pageCount: number;
+    changePage: (data: { selected: number }) => void;
+};
+
+// Category list type
+export type CategoryListType = {
+    _id: string;
+    categoryID: string;
+    category_name: string;
+    category_desc: string;
+    is_delete: boolean,
+    createdAt: string;
+    updatedAt: string;
+    __v: string;
+};
+
+// Promise retun type FetchAllUserResponse
+export type FetchAllCategoryResponse = {
+    data: [CategoryListType];
+    message: string;
+    success: boolean;
 };

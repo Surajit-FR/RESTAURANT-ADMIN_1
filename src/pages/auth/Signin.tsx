@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { clearError, loginUser } from '../../services/slices/AuthSlice';
 import Cookies from 'js-cookie';
-import { DecryptData } from '../../util/EncryptDecrypt';
+import { DecryptData } from '../../helper/EncryptDecrypt';
 import { useFormik } from 'formik';
 import { loginValidationSchema } from '../../helper/FormValidation';
 import CustomAlert from '../../util/CustomAlert';

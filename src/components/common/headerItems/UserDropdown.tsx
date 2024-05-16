@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { logoutUser } from "../../../services/slices/AuthSlice";
 import { useDispatch } from "react-redux";
-import { DecryptData } from "../../../util/EncryptDecrypt";
+import { DecryptData } from "../../../helper/EncryptDecrypt";
 import { dropdownItemsType } from "../../../config/DataTypes.config";
 
 const UserDropdown = (): JSX.Element => {
