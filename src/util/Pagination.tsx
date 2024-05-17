@@ -1,14 +1,16 @@
 import ReactPaginate from "react-paginate";
 import { Pagination_Type } from "../config/DataTypes.config";
 
-const Pagination = ({ pageCount, changePage }: Pagination_Type): JSX.Element => {
+const Pagination = ({ pageCount, pageNumber, changePage }: Pagination_Type): JSX.Element => {
     return (
         <>
             <ul className="pagination">
                 <ReactPaginate
                     breakLabel=''
-                    previousLabel={<i className="fadeIn animated bx bx-caret-left"></i>}
-                    nextLabel={<i className="fadeIn animated bx bx-caret-right"></i>}
+                    previousLabel="Preview"
+                    // previousLabel={<i className="fadeIn animated bx bx-caret-left"></i>}
+                    nextLabel="Next"
+                    // nextLabel={<i className="fadeIn animated bx bx-caret-right"></i>}
                     pageCount={pageCount}
                     onPageChange={changePage}
                     containerClassName={"pagination"}
@@ -19,6 +21,7 @@ const Pagination = ({ pageCount, changePage }: Pagination_Type): JSX.Element => 
                     nextClassName={"page-item"}
                     nextLinkClassName={"page-link"}
                     activeClassName={"active"}
+                    forcePage={pageNumber}
                     renderOnZeroPageCount={null}
                 />
             </ul>

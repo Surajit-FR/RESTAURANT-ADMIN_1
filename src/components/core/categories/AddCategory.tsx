@@ -5,8 +5,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { addCategory, clearCategoryRespData, clearError } from "../../../services/slices/UtilitySlice";
 import { useEffect } from "react";
 import { Pagination_Type } from "../../../config/DataTypes.config";
+import { REACT_APP_DATA_PER_PAGE } from "../../../config/App.config";
 
-const AddCategory = ({ pageCount, changePage }: Pagination_Type): JSX.Element => {
+const AddCategory = ({ pageNumber }: Pagination_Type): JSX.Element => {
     const { category_resp_data, error } = useSelector((state: any) => state.utilitySlice);
     const dispatch: any = useDispatch();
 
@@ -20,6 +21,9 @@ const AddCategory = ({ pageCount, changePage }: Pagination_Type): JSX.Element =>
         }
     };
 
+    // dataPerPage
+    const dataPerPage = REACT_APP_DATA_PER_PAGE;
+
     // form validation
     const { values, errors, touched, handleBlur, handleChange, handleSubmit, isValid, resetForm } = useFormik({
         initialValues: {
@@ -28,7 +32,7 @@ const AddCategory = ({ pageCount, changePage }: Pagination_Type): JSX.Element =>
         },
         validationSchema: categoryValidationSchema,
         onSubmit: (values) => {
-            dispatch(addCategory({ data: values, header }));
+            dispatch(addCategory({ data: values, page: (pageNumber + 1), pageSize: dataPerPage, header }));
         }
     });
 
@@ -46,7 +50,6 @@ const AddCategory = ({ pageCount, changePage }: Pagination_Type): JSX.Element =>
         }
     }, [category_resp_data, resetForm]);
 
-
     useEffect(() => {
         return () => {
             dispatch(clearError());
@@ -54,20 +57,15 @@ const AddCategory = ({ pageCount, changePage }: Pagination_Type): JSX.Element =>
         }
     }, [dispatch]);
 
-
     return (
         <>
             <div className="col-12 col-lg-4 d-flex">
                 <div className="card border shadow-none w-100">
                     <div className="card-body">
 
-                        {/* Error alert */}
-                        {
-                            error?.success === false ?
-                                <CustomAlert type="danger" message={error?.message} />
-                                : category_resp_data?.success === true ? <CustomAlert type="success" message={category_resp_data?.message} />
-                                    : null
-                        }
+                        {/* Alert */}
+                        {error?.success === false ? <CustomAlert type="danger" message={error?.message} /> : null}
+                        {category_resp_data?.success === true ? <CustomAlert type="success" message={category_resp_data?.message} /> : null}
 
                         <form className="row g-3" onSubmit={handleSubmit}>
                             {/* Category Name */}

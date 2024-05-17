@@ -1,6 +1,6 @@
 import React from "react";
 
-const Loader = (): JSX.Element => {
+const Loader = ({ loading }: { loading: boolean }): JSX.Element => {
     const containerStyle: React.CSSProperties = {
         position: "absolute",
         top: "50%",
@@ -22,19 +22,22 @@ const Loader = (): JSX.Element => {
 
     return (
         <>
-            <div>
-                <div className="d-flex justify-content-center align-items-center" style={containerStyle}>
-                    <div className="spinner-grow" role="status" style={spinnerStyle2}>
-                        <span className="visually-hidden">Loading...</span>
+            {
+                loading &&
+                <div>
+                    <div className="d-flex justify-content-center align-items-center" style={containerStyle}>
+                        <div className="spinner-grow" role="status" style={spinnerStyle2}>
+                            <span className="visually-hidden">Loading...</span>
+                        </div>
+                        <div className="spinner-grow mx-2" role="status" style={spinnerStyle1}>
+                            <span className="visually-hidden">Loading...</span>
+                        </div>
+                        <div className="spinner-grow" role="status" style={spinnerStyle2}>
+                            <span className="visually-hidden">Loading...</span>
+                        </div>
                     </div>
-                    <div className="spinner-grow mx-2" role="status" style={spinnerStyle1}>
-                        <span className="visually-hidden">Loading...</span>
-                    </div>
-                    <div className="spinner-grow" role="status" style={spinnerStyle2}>
-                        <span className="visually-hidden">Loading...</span>
-                    </div>
-                </div>
-            </div >
+                </div >
+            }
         </>
     );
 };

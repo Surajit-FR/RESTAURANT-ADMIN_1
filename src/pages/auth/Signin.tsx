@@ -16,7 +16,7 @@ const user = DecryptData(userCookie ? userCookie : "");
 const Signin = (): JSX.Element => {
     const token: string | null = window.localStorage.getItem("token");
     const _TOKEN = JSON.parse(token ?? 'null');
-    const { error, loading } = useSelector((state: any) => state.authSlice);
+    const { error, auth_loading } = useSelector((state: any) => state.authSlice);
     const location = useLocation();
     const dispatch: any = useDispatch();
     const navigate: any = useNavigate();
@@ -63,7 +63,7 @@ const Signin = (): JSX.Element => {
     return (
         <>
             {/* Loader */}
-            {loading && <Loader />}
+            <Loader loading={auth_loading} />
 
             <div className="wrapper">
                 <main className="authentication-content mt-5">

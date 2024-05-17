@@ -83,6 +83,7 @@ const Products = (): JSX.Element => {
                             {/* Pagination */}
                             <Pagination
                                 pageCount={pageCount}
+                                pageNumber={pageNumber}
                                 changePage={changePage}
                             />
                         </nav>

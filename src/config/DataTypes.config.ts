@@ -15,7 +15,10 @@ export type formValuesType = {
 export type FormValues_Props = {
     data?: formValuesType | undefined;
     header?: CustomHeadersType | undefined;
+    page?: number | undefined;
+    pageSize?: number | undefined;
     navigate?: any;
+    category_id?: string | undefined;
 };
 
 // Add category success resp type
@@ -91,6 +94,7 @@ export type dropdownItemsType = {
 // Define the pagination type
 export type Pagination_Type = {
     pageCount: number;
+    pageNumber: number;
     changePage: (data: { selected: number }) => void;
 };
 

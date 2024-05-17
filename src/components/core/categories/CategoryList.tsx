@@ -1,20 +1,33 @@
+import { useSelector } from 'react-redux';
 import { CategoryListType } from '../../../config/DataTypes.config';
 import Pagination from '../../../util/Pagination';
 import Category from './Category';
+import CustomAlert from '../../../util/CustomAlert';
 
 type categoryList_props = {
     newData: Array<CategoryListType> | undefined,
     pageCount: number,
+    pageNumber: number,
     changePage: (data: { selected: number }) => void,
+    setCategoryID: (id: string) => void
 }
 
-const CategoryList = ({ newData, pageCount, changePage }: categoryList_props): JSX.Element => {
+const CategoryList = ({ newData, pageCount, pageNumber, changePage, setCategoryID }: categoryList_props): JSX.Element => {
+    const { category_del_resp, del_error } = useSelector((state: any) => state.utilitySlice);
 
     return (
         <>
+
             <div className="col-12 col-lg-8 d-flex">
                 <div className="card border shadow-none w-100">
                     <div className="card-body">
+                        {/* Alert */}
+                        {
+                            del_error?.success === false ?
+                                <CustomAlert type="danger" message={del_error?.message} />
+                                : category_del_resp?.success === true ? <CustomAlert type="success" message={category_del_resp?.message} />
+                                    : null
+                        }
                         <div className="table-responsive">
                             <table className="table align-middle">
                                 <thead className="table-light">
@@ -26,27 +39,20 @@ const CategoryList = ({ newData, pageCount, changePage }: categoryList_props): J
                                     </tr>
                                 </thead>
                                 <tbody>
-
-                                    {/* Category */}
-                                    {
-                                        newData?.map((item) => {
-                                            return (
-
-                                                <Category
-                                                    key={item?._id}
-                                                    data={item}
-                                                />
-                                            )
-                                        })
-                                    }
-
+                                    {newData?.map((item, index) => (
+                                        <Category
+                                            index={index}
+                                            key={item?._id}
+                                            data={item}
+                                            setCategoryID={setCategoryID}
+                                        />
+                                    ))}
                                 </tbody>
                             </table>
                         </div>
-
-                        {/* Pagination */}
                         <nav className="float-end mt-0" aria-label="Page navigation">
                             <Pagination
+                                pageNumber={pageNumber}
                                 pageCount={pageCount}
                                 changePage={changePage}
                             />

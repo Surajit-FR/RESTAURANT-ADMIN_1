@@ -9,4 +9,6 @@ export const LOGIN = (data: signinInputValues) => API.post("/api/login", data);
 // Add category
 export const ADDCATEGORY = (data: formValuesType | undefined, header: CustomHeadersType | undefined) => API.post("/admin/api/add/new/category", data, header);
 // Get all categories
-export const GETALLCATEGORIES = (header: CustomHeadersType | undefined) => API.get("/admin/api/get/all/category", header);
+export const GETALLCATEGORIES = (page: number | undefined, pageSize: number | undefined, header: CustomHeadersType | undefined) => API.get(`/admin/api/get/all/category?page=${page}&pageSize=${pageSize}`, header);
+// Delete categories
+export const DELETECATEGORY = (category_id: string | undefined, header: CustomHeadersType | undefined) => API.delete(`/admin/api/delete/category/${category_id}`, header);
