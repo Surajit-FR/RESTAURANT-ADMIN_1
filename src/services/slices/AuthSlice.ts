@@ -44,7 +44,7 @@ const AuthSlice = createSlice({
             state.user_data = [];
             payload('/admin/signin');
         },
-        clearError(state) {
+        clearAuthError(state) {
             state.error = null;
         }
     },
@@ -66,5 +66,5 @@ const AuthSlice = createSlice({
 })
 
 
-export const { logoutUser, clearError } = AuthSlice.actions;
+export const { logoutUser, clearAuthError } = AuthSlice.actions;
 export default AuthSlice.reducer;

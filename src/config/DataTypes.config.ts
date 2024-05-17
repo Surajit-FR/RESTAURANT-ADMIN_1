@@ -82,6 +82,7 @@ export type LoginSuccessResponse = {
 export type CustomAlertProps = {
     type: 'success' | 'danger' | 'warning' | 'info' | 'dark';
     message: string;
+    onClose: () => void;
 }
 
 // User drop down links type

@@ -28,7 +28,7 @@ const alertStyles = {
     },
 };
 
-const CustomAlert = ({ type, message }: CustomAlertProps): JSX.Element => {
+const CustomAlert = ({ type, message, onClose }: CustomAlertProps): JSX.Element => {
     const styles = alertStyles[type];
 
     return (
@@ -39,7 +39,13 @@ const CustomAlert = ({ type, message }: CustomAlertProps): JSX.Element => {
                     <div className={styles.textClass}>{message}</div>
                 </div>
             </div>
-            <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="alert"
+                aria-label="Close"
+                onClick={onClose} // Add this line
+            ></button>
         </div>
     );
 };

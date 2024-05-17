@@ -50,13 +50,6 @@ const AddCategory = ({ pageNumber }: Pagination_Type): JSX.Element => {
         }
     }, [category_resp_data, resetForm]);
 
-    useEffect(() => {
-        return () => {
-            dispatch(clearError());
-            dispatch(clearCategoryRespData());
-        }
-    }, [dispatch]);
-
     return (
         <>
             <div className="col-12 col-lg-4 d-flex">
@@ -64,8 +57,8 @@ const AddCategory = ({ pageNumber }: Pagination_Type): JSX.Element => {
                     <div className="card-body">
 
                         {/* Alert */}
-                        {error?.success === false ? <CustomAlert type="danger" message={error?.message} /> : null}
-                        {category_resp_data?.success === true ? <CustomAlert type="success" message={category_resp_data?.message} /> : null}
+                        {error?.success === false ? <CustomAlert type="danger" message={error?.message} onClose={() => dispatch(clearError())} /> : null}
+                        {category_resp_data?.success === true ? <CustomAlert type="success" message={category_resp_data?.message} onClose={() => dispatch(clearCategoryRespData())} /> : null}
 
                         <form className="row g-3" onSubmit={handleSubmit}>
                             {/* Category Name */}

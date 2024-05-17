@@ -1,8 +1,10 @@
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { CategoryListType } from '../../../config/DataTypes.config';
 import Pagination from '../../../util/Pagination';
 import Category from './Category';
 import CustomAlert from '../../../util/CustomAlert';
+import { clearCategoryDelResp, clearDelError } from '../../../services/slices/UtilitySlice';
+import { Dispatch } from 'redux';
 
 type categoryList_props = {
     newData: Array<CategoryListType> | undefined,
@@ -14,6 +16,7 @@ type categoryList_props = {
 
 const CategoryList = ({ newData, pageCount, pageNumber, changePage, setCategoryID }: categoryList_props): JSX.Element => {
     const { category_del_resp, del_error } = useSelector((state: any) => state.utilitySlice);
+    const dispatch: Dispatch<any> = useDispatch();
 
     return (
         <>
@@ -22,12 +25,8 @@ const CategoryList = ({ newData, pageCount, pageNumber, changePage, setCategoryI
                 <div className="card border shadow-none w-100">
                     <div className="card-body">
                         {/* Alert */}
-                        {
-                            del_error?.success === false ?
-                                <CustomAlert type="danger" message={del_error?.message} />
-                                : category_del_resp?.success === true ? <CustomAlert type="success" message={category_del_resp?.message} />
-                                    : null
-                        }
+                        {del_error?.success === false ? <CustomAlert type="danger" message={del_error?.message} onClose={() => dispatch(clearDelError())} /> : null}
+                        {category_del_resp?.success === true ? <CustomAlert type="success" message={category_del_resp?.message} onClose={() => dispatch(clearCategoryDelResp())} /> : null}
                         <div className="table-responsive">
                             <table className="table align-middle">
                                 <thead className="table-light">

@@ -56,6 +56,7 @@ const UtilitySlice = createSlice({
     },
     reducers: {
         clearCategoryRespData(state) {
+            console.log("clearCategoryRespData call");
             state.category_resp_data = null;
         },
         clearCategoryDelResp(state) {
@@ -63,6 +64,9 @@ const UtilitySlice = createSlice({
         },
         clearError(state) {
             state.error = null;
+        },
+        clearDelError(state) {
+            state.del_error = null;
         }
     },
     extraReducers: builder => {
@@ -114,5 +118,5 @@ const UtilitySlice = createSlice({
 })
 
 
-export const { clearCategoryRespData, clearCategoryDelResp, clearError } = UtilitySlice.actions;
+export const { clearCategoryRespData, clearCategoryDelResp, clearError, clearDelError } = UtilitySlice.actions;
 export default UtilitySlice.reducer;

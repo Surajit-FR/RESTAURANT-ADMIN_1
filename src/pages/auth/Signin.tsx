@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { clearError, loginUser } from '../../services/slices/AuthSlice';
+import { clearAuthError, loginUser } from '../../services/slices/AuthSlice';
 import Cookies from 'js-cookie';
 import { DecryptData } from '../../helper/EncryptDecrypt';
 import { useFormik } from 'formik';
@@ -49,7 +49,7 @@ const Signin = (): JSX.Element => {
             navigate("/admin/signin");
         }
         return () => {
-            dispatch(clearError());
+            dispatch(clearAuthError());
         };
     }, [_TOKEN, navigate, dispatch]);
 
@@ -59,6 +59,7 @@ const Signin = (): JSX.Element => {
         }
         return null;
     };
+
 
     return (
         <>
@@ -78,7 +79,7 @@ const Signin = (): JSX.Element => {
                                             <div className="row g-3">
 
                                                 {/* Error alert */}
-                                                {error && <CustomAlert type="danger" message={error?.message} />}
+                                                {error && <CustomAlert type="danger" message={error?.message} onClose={() => dispatch(clearAuthError())} />}
 
                                                 {/* Email Input */}
                                                 <div className="col-12">
