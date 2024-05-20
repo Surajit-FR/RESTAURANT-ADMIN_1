@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { ADDCATEGORY, ADDPRODUCT, DELETECATEGORY, GETALLCATEGORIES } from "../api/Api";
-import { AddCategorySuccessResponse, AddProductSuccessResponse, FetchAllCategoryResponse, FormValues_Props } from "../../config/DataTypes.config";
+import { ADDCATEGORY, ADDPRODUCT, DELETECATEGORY, GETALLCATEGORIES, GETALLPRODUCTS } from "../api/Api";
+import { AddCategorySuccessResponse, AddProductSuccessResponse, FetchAllCategoryResponse, FetchAllProductResponse, FormValues_Props } from "../../config/DataTypes.config";
 
 // addCategory thunk
 export const addCategory = createAsyncThunk("/admin/api/add/new/category", async ({ data, page, pageSize, header }: FormValues_Props, { rejectWithValue, dispatch }): Promise<AddCategorySuccessResponse | any> => {
@@ -58,6 +58,20 @@ export const addProduct = createAsyncThunk("/admin/api/add/new/product", async (
     }
 });
 
+// getAllProduct thunk
+export const getAllProduct = createAsyncThunk("/admin/api/get/all/product", async ({ page, pageSize, header }: FormValues_Props, { rejectWithValue }): Promise<FetchAllProductResponse | any> => {
+    try {
+        const response = await GETALLPRODUCTS(page, pageSize, header);
+        const result: AddProductSuccessResponse = response?.data;
+        if (result?.success) {
+            return result
+        };
+    } catch (exc: any) {
+        const err: any = rejectWithValue(exc.response.data);
+        return err;
+    }
+});
+
 const UtilitySlice = createSlice({
     name: "utilitySlice",
     initialState: {
@@ -65,7 +79,7 @@ const UtilitySlice = createSlice({
         category_del_resp: null,
         category_data: [],
         add_product_resp_data: null,
-        product_data: [],
+        products_data: [],
         utility_loading: false,
         error: null,
         del_error: null,
@@ -143,6 +157,21 @@ const UtilitySlice = createSlice({
             state.add_product_resp_data = add_product_resp_data;
         })
         builder.addCase(addProduct.rejected, (state, { payload }) => {
+            state.utility_loading = false;
+            const err: any | null = payload;
+            state.error = err;
+        })
+
+        // getAllProduct states
+        builder.addCase(getAllProduct.pending, (state) => {
+            state.utility_loading = true;
+        })
+        builder.addCase(getAllProduct.fulfilled, (state, { payload }) => {
+            state.utility_loading = false;
+            const products_data: any = payload;
+            state.products_data = products_data;
+        })
+        builder.addCase(getAllProduct.rejected, (state, { payload }) => {
             state.utility_loading = false;
             const err: any | null = payload;
             state.error = err;

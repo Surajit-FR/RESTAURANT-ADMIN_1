@@ -126,9 +126,39 @@ export type CategoryListType = {
     __v: string;
 };
 
-// Promise retun type FetchAllUserResponse
+// Promise retun type FetchAllCategoryResponse
 export type FetchAllCategoryResponse = {
     data: [CategoryListType];
     message: string;
     success: boolean;
 };
+
+// Product list type
+export type ProductListType = {
+    _id: string;
+    productTitle: string;
+    offer: string;
+    offerPercentage: string;
+    productImage: string;
+    productDescription: string;
+    price: string;
+    availability: string;
+    visibility: string;
+    categories: Array<string>;
+    is_delete: boolean,
+    createdAt: string;
+    updatedAt: string;
+    __v: string;
+};
+
+// Promise retun type FetchAllProductResponse
+export type FetchAllProductResponse = {
+    data: [ProductListType];
+    message: string;
+    success: boolean;
+};
+
+// Search_props_type
+export type Search_props_type = {
+    placeholder: string
+}

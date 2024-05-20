@@ -1,23 +1,48 @@
 import { Link } from "react-router-dom";
 import Pagination from "../../util/Pagination";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Product from "../../components/core/products/Product";
+import { useDispatch, useSelector } from "react-redux";
+import { Dispatch } from "redux";
+import { getAllCategory, getAllProduct } from "../../services/slices/UtilitySlice";
+import { CategoryListType, ProductListType } from "../../config/DataTypes.config";
+import { REACT_APP_DATA_PER_PAGE } from "../../config/App.config";
+import Search from "../../components/common/Search";
 
 const Products = (): JSX.Element => {
+    const { products_data, category_data } = useSelector((state: any) => state.utilitySlice);
+    const dispatch: Dispatch<any> = useDispatch();
+
+    const token: string | null = window.localStorage.getItem("token");
+    const _TOKEN = JSON.parse(token ?? 'null');
+
+    const header = useMemo(() => ({
+        headers: {
+            Authorization: `Bearer ${_TOKEN}`
+        }
+    }), [_TOKEN]);
+
     const [pageNumber, setPageNumber] = useState<number>(0);
-    const blogData: Array<number> = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+    const [productData, setProductData] = useState<ProductListType[]>([]);
+    const [categoryData, setCategoryData] = useState<CategoryListType[]>([]);
 
     // pagination
-    const dataPerPage = 5;
-    const pagesVisited = pageNumber * dataPerPage;
-    const newBlogData = blogData?.slice(pagesVisited, pagesVisited + dataPerPage); // will be looped for show data
-    const pageCount = Math.ceil((blogData?.length || 0) / dataPerPage);
+    const dataPerPage = REACT_APP_DATA_PER_PAGE;
+    const pageCount = products_data?.totalPages;
 
     const changePage = ({ selected }: { selected: number }) => {
         setPageNumber(selected);
     };
 
-    console.log({ newBlogData });
+    useEffect(() => {
+        dispatch(getAllProduct({ page: (pageNumber + 1), pageSize: dataPerPage, header }));
+        dispatch(getAllCategory({ header }));
+    }, [dispatch, dataPerPage, header, pageNumber]);
+
+    useEffect(() => {
+        setProductData(products_data?.data);
+        setCategoryData(category_data?.data);
+    }, [products_data, category_data]);
 
     return (
         <>
@@ -54,19 +79,25 @@ const Products = (): JSX.Element => {
                 <div className="card">
                     <div className="card-header py-3">
                         <div className="row g-3 align-items-center">
+
+                            {/* Search Products */}
                             <div className="col-lg-3 col-md-6 me-auto">
-                                <div className="ms-auto position-relative">
-                                    <div className="position-absolute top-50 translate-middle-y search-icon px-3"><i className="bi bi-search"></i>
-                                    </div>
-                                    <input className="form-control ps-5" type="text" placeholder="search produts" />
-                                </div>
+                                <Search
+                                    placeholder="Search Produts"
+                                />
                             </div>
+
                             <div className="col-lg-2 col-6 col-md-3">
                                 <select className="form-select">
                                     <option>All category</option>
-                                    <option>Fashion</option>
+                                    {categoryData && categoryData.map((item) => {
+                                        return (
+                                            <option key={item?.categoryID} value={item?._id}>{item?.category_name}</option>
+                                        )
+                                    })}
                                 </select>
                             </div>
+
                         </div>
                     </div>
                     <div className="card-body">
@@ -74,7 +105,14 @@ const Products = (): JSX.Element => {
                             <div className="row row-cols-1 row-cols-lg-4 row-cols-xl-4 row-cols-xxl-5 g-3">
 
                                 {/* Products */}
-                                <Product />
+                                {productData && productData?.map((item) => {
+                                    return (
+                                        <Product
+                                            key={item?._id}
+                                            data={item}
+                                        />
+                                    )
+                                })}
 
                             </div>
                         </div>
