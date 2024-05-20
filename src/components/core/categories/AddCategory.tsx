@@ -24,7 +24,7 @@ const AddCategory = ({ pageNumber }: Pagination_Type): JSX.Element => {
     // dataPerPage
     const dataPerPage = REACT_APP_DATA_PER_PAGE;
 
-    // form validation
+    // taking form values
     const { values, errors, touched, handleBlur, handleChange, handleSubmit, isValid, resetForm } = useFormik({
         initialValues: {
             category_name: "",

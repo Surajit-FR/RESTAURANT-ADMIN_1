@@ -26,7 +26,6 @@ const Categories = (): JSX.Element => {
     const [categoryData, setCategoryData] = useState<CategoryListType[]>([]);
 
     const dataPerPage = REACT_APP_DATA_PER_PAGE;
-
     const pageCount = category_data?.totalPages;
 
     const changePage = ({ selected }: { selected: number }) => {

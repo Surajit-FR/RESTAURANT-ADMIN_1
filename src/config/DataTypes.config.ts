@@ -9,11 +9,20 @@ export type CustomHeadersType = {
 export type formValuesType = {
     category_name?: string;
     category_desc?: string;
+    productTitle?: string;
+    offer?: string;
+    offerPercentage?: string;
+    productImage?: string | null;
+    productDescription?: string;
+    price?: string;
+    availability?: string;
+    visibility?: string;
+    categories?: Array<string>;
 };
 
 // Form value props type
 export type FormValues_Props = {
-    data?: formValuesType | undefined;
+    data?: formValuesType | FormData | undefined;
     header?: CustomHeadersType | undefined;
     page?: number | undefined;
     pageSize?: number | undefined;
@@ -23,6 +32,12 @@ export type FormValues_Props = {
 
 // Add category success resp type
 export type AddCategorySuccessResponse = {
+    message: string;
+    success: boolean;
+};
+
+// Add Product success resp type
+export type AddProductSuccessResponse = {
     message: string;
     success: boolean;
 };
