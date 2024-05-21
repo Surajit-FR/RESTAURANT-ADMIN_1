@@ -93,7 +93,7 @@ const Products = (): JSX.Element => {
                         <div className="row align-items-center">
                             <div className="col-lg-3 col-xl-2">
                                 <Link to="/add/product" className="btn btn-primary mb-3 mb-lg-0">
-                                    <i className="bi bi-plus-square-fill me-2">
+                                    <i className="lni lni-plus me-2">
                                     </i>Add Product
                                 </Link>
                             </div>

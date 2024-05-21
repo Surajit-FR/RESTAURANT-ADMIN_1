@@ -1,6 +1,8 @@
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { CustomHeadersType } from "../config/DataTypes.config";
 import { REACT_APP_BASE_URL } from "../config/App.config";
+import { clearProductsDetailsData } from "../services/slices/UtilitySlice";
+import { Dispatch } from "redux";
 
 interface ProductDetailsModalProps {
     modalId: string;
@@ -10,6 +12,7 @@ interface ProductDetailsModalProps {
 
 const ProductDetailsModal = ({ modalId, productID, header }: ProductDetailsModalProps): JSX.Element => {
     const { products_details_data } = useSelector((state: any) => state.utilitySlice);
+    const dispatch: Dispatch<any> = useDispatch();
 
     const imageContainer: React.CSSProperties = {
         height: "400px",
@@ -27,9 +30,12 @@ const ProductDetailsModal = ({ modalId, productID, header }: ProductDetailsModal
         borderRadius: "5px",
     };
 
+    console.log(products_details_data);
+
+
     return (
         <>
-            <div className="modal fade" id={modalId} tabIndex={-1} aria-hidden="true">
+            <div className="modal fade" id={modalId} tabIndex={-1} aria-hidden="true" data-bs-backdrop="static">
                 <div className="modal-dialog modal-lg">
                     <div className="modal-content">
                         <div className="modal-header">
@@ -37,7 +43,7 @@ const ProductDetailsModal = ({ modalId, productID, header }: ProductDetailsModal
                             <h4 className="modal-title">
                                 {products_details_data?.data?.productTitle}
                             </h4>
-                            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={() => dispatch(clearProductsDetailsData())}></button>
                         </div>
                         <div className="modal-body">
                             {/* Image */}
@@ -53,7 +59,7 @@ const ProductDetailsModal = ({ modalId, productID, header }: ProductDetailsModal
                                 {/* Product Offer */}
                                 <div className="col-md-6">
                                     <h5 style={{ fontSize: "16px" }}>Product Offer:
-                                        <span className="mx-2" style={{ fontWeight: "normal", fontSize: "14px" }}>{products_details_data?.data?.offer === "true" ? "Yes" : "N/A"}</span>
+                                        <span className="mx-2" style={{ fontWeight: "normal", fontSize: "14px" }}>{products_details_data?.data?.offer === "true" ? "Yes" : "No"}</span>
                                     </h5>
                                 </div>
 
@@ -104,11 +110,11 @@ const ProductDetailsModal = ({ modalId, productID, header }: ProductDetailsModal
                                     </h5>
                                 </div>
                             </div>
+                        </div>
 
-                        </div>
-                        <div className="modal-footer">
-                            <button type="button" className="btn btn-dark" data-bs-dismiss="modal">OK</button>
-                        </div>
+                        {/* <div className="modal-footer">
+                            <button type="button" className="btn btn-dark" data-bs-dismiss="modal" onClick={() => dispatch(clearProductsDetailsData())}>OK</button>
+                        </div> */}
                     </div>
                 </div>
             </div>

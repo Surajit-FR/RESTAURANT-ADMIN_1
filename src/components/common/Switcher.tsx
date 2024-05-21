@@ -43,13 +43,13 @@ const Switcher = (): JSX.Element => {
     const switcherContainer: React.CSSProperties = {
         position: "fixed",
         right: "0px",
-        top: "20%",
+        top: "33%",
         borderTopRightRadius: "0",
         borderTopLeftRadius: "10px",
         borderBottomRightRadius: "0",
         borderBottomLeftRadius: "10px",
-        bottom: "30%"
-    }
+        bottom: "43%"
+    };
 
     return (
         <>
@@ -76,10 +76,6 @@ const Switcher = (): JSX.Element => {
                     </div>
 
                     <div className="offcanvas-body">
-                        {/* Theme Variation */}
-                        <h6 className="mb-0">Theme Variation</h6>
-                        <hr />
-
                         {/* Light Theme */}
                         <div className="form-check form-check-inline">
                             <input
@@ -91,7 +87,7 @@ const Switcher = (): JSX.Element => {
                                 checked={_USER_DATA?.web_theme === 'light-theme'}
                                 onChange={handleThemeChange}
                             />
-                            <label className="form-check-label" htmlFor="light-theme">Light</label>
+                            <label className="form-check-label" htmlFor="light-theme"><i className="lni lni-sun"></i> Light</label>
                         </div>
 
                         {/* Dark Theme */}
@@ -105,7 +101,7 @@ const Switcher = (): JSX.Element => {
                                 checked={_USER_DATA?.web_theme === 'dark-theme'}
                                 onChange={handleThemeChange}
                             />
-                            <label className="form-check-label" htmlFor="dark-theme">Dark</label>
+                            <label className="form-check-label" htmlFor="dark-theme"><i className="lni lni-night"></i> Dark</label>
                         </div>
 
                         {/* Semi Dark Theme */}
@@ -119,7 +115,7 @@ const Switcher = (): JSX.Element => {
                                 checked={_USER_DATA?.web_theme === 'semi-dark'}
                                 onChange={handleThemeChange}
                             />
-                            <label className="form-check-label" htmlFor="semi-dark">Semi Dark</label>
+                            <label className="form-check-label" htmlFor="semi-dark"><i className="lni lni-cloudy-sun"></i> Semi Dark</label>
                         </div>
 
                         {/* Minimal Theme */}
@@ -134,7 +130,7 @@ const Switcher = (): JSX.Element => {
                                 checked={_USER_DATA?.web_theme === 'minimal-theme'}
                                 onChange={handleThemeChange}
                             />
-                            <label className="form-check-label" htmlFor="minimal-theme">Minimal Theme</label>
+                            <label className="form-check-label" htmlFor="minimal-theme"><i className="lni lni-bolt-alt"></i> Minimal Theme</label>
                         </div>
                         <hr />
                     </div>

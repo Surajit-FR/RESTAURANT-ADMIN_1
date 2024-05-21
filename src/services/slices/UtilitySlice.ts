@@ -133,7 +133,10 @@ const UtilitySlice = createSlice({
         },
         clearDelError(state) {
             state.del_error = null;
-        }
+        },
+        clearProductsDetailsData(state) {
+            state.products_details_data = [];
+        },
     },
     extraReducers: builder => {
         // addCategory states
@@ -250,6 +253,7 @@ export const {
     clearCategoryDelResp,
     clearError,
     clearDelError,
-    clearProductDelResp
+    clearProductDelResp,
+    clearProductsDetailsData,
 } = UtilitySlice.actions;
 export default UtilitySlice.reducer;
