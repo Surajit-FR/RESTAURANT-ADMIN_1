@@ -17,7 +17,8 @@ export type formValuesType = {
     price?: string;
     availability?: string;
     visibility?: string;
-    categories?: Array<string>;
+    categories?: string;
+    web_theme?: string;
 };
 
 // Form value props type
@@ -28,6 +29,7 @@ export type FormValues_Props = {
     pageSize?: number | undefined;
     navigate?: any;
     category_id?: string | undefined;
+    product_id?: string | undefined;
 };
 
 // Add category success resp type
@@ -81,6 +83,7 @@ export type LoginSuccessResponse = {
         full_name: string;
         email: string;
         password: string;
+        web_theme: string;
         role: Role;
         is_active: boolean;
         is_delete: boolean;
@@ -144,7 +147,7 @@ export type ProductListType = {
     price: string;
     availability: string;
     visibility: string;
-    categories: Array<string>;
+    categories: Array<CategoryListType>;
     is_delete: boolean,
     createdAt: string;
     updatedAt: string;

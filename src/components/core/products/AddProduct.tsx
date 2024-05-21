@@ -36,7 +36,7 @@ const AddProduct = () => {
             price: "",
             availability: "Available",
             visibility: "Show",
-            categories: []
+            category: ""
         },
         validationSchema: addProductValidationSchema,
         onSubmit: (values) => {
@@ -57,9 +57,7 @@ const AddProduct = () => {
             formData.append("price", values.price);
             formData.append("availability", values.availability);
             formData.append("visibility", values.visibility);
-            values.categories.forEach(categoryId => {
-                formData.append("categories[]", categoryId);
-            });
+            formData.append("category", values.category);
 
             // Dispatch addProduct action with formData and header
             dispatch(addProduct({ data: formData, header }));
@@ -320,12 +318,13 @@ const AddProduct = () => {
                                                                 <div className="form-check" key={item?._id}>
                                                                     <input
                                                                         className="form-check-input"
-                                                                        type="checkbox"
+                                                                        type="radio"
                                                                         id={item?._id}
-                                                                        name="categories"
+                                                                        name="category"
                                                                         value={item?._id}
                                                                         onChange={handleChange}
                                                                         onBlur={handleBlur}
+                                                                        checked={values.category === item?._id} // Ensure single selection
                                                                     />
                                                                     <label className="form-check-label" htmlFor={item?._id}>
                                                                         {item?.category_name}
@@ -333,9 +332,8 @@ const AddProduct = () => {
                                                                 </div>
                                                             ))}
                                                         </div>
-                                                        {touched.categories && errors.categories && <div className="text-danger" style={{ fontSize: "13px" }}>*{errors.categories}</div>}
+                                                        {touched.category && errors.category && <div className="text-danger" style={{ fontSize: "13px" }}>*{errors.category}</div>}
                                                     </div>
-
                                                 </div>
                                                 {/* <!--end row--> */}
                                             </div>

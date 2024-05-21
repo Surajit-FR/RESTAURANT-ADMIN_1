@@ -1,9 +1,10 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { LOGIN } from "../api/Api";
-import { LoginSuccessResponse, UserAuth_Props } from "../../config/DataTypes.config";
+import { LOGIN, UPDATETHEME } from "../api/Api";
+import { FormValues_Props, LoginSuccessResponse, UserAuth_Props } from "../../config/DataTypes.config";
 import { EncryptData } from "../../helper/EncryptDecrypt";
 import Cookies from 'js-cookie';
 
+// loginUser thunk
 export const loginUser = createAsyncThunk("/api/login", async ({ data, navigate }: UserAuth_Props, { rejectWithValue }): Promise<LoginSuccessResponse | any> => {
     try {
         const response = await LOGIN(data);
@@ -30,11 +31,38 @@ export const loginUser = createAsyncThunk("/api/login", async ({ data, navigate 
     }
 });
 
+// updateTheme thunk
+export const updateTheme = createAsyncThunk("/api/update/theme", async ({ data, header }: FormValues_Props, { rejectWithValue }): Promise<LoginSuccessResponse | any> => {
+    try {
+        const response = await UPDATETHEME(data, header);
+        const result: LoginSuccessResponse = response?.data;
+        if (result?.success) {
+            if (result?.data?.remember_me === true) {
+                const encUserData = EncryptData(data);
+                Cookies.set('user', encUserData, {
+                    expires: 7, // Cookie expiration (days)
+                    sameSite: 'None', // Ensure the cookie is sent in all contexts
+                });
+            } else {
+                Cookies.remove('user');
+            }
+            const user = EncryptData(result?.data);
+            window.localStorage.setItem("token", JSON.stringify(result?.token));
+            window.localStorage.setItem("user", user);
+            return result;
+        }
+    } catch (exc: any) {
+        const err: any = rejectWithValue(exc.response.data);
+        return err;
+    }
+});
+
 const AuthSlice = createSlice({
     name: "authSlice",
     initialState: {
         user_data: [],
         auth_loading: false,
+        update_theme_resp: null,
         error: null
     },
     reducers: {
@@ -46,9 +74,13 @@ const AuthSlice = createSlice({
         },
         clearAuthError(state) {
             state.error = null;
-        }
+        },
+        clearUpdateThemeResp(state) {
+            state.update_theme_resp = null;
+        },
     },
     extraReducers: builder => {
+        // loginUser states
         builder.addCase(loginUser.pending, (state) => {
             state.auth_loading = true;
         })
@@ -62,9 +94,24 @@ const AuthSlice = createSlice({
             const err: any | null = payload;
             state.error = err;
         })
+
+        // updateTheme states
+        builder.addCase(updateTheme.pending, (state) => {
+            state.auth_loading = true;
+        })
+        builder.addCase(updateTheme.fulfilled, (state, { payload }) => {
+            state.auth_loading = false;
+            const update_theme_resp: any = payload;
+            state.update_theme_resp = update_theme_resp;
+        })
+        builder.addCase(updateTheme.rejected, (state, { payload }) => {
+            state.auth_loading = false;
+            const err: any | null = payload;
+            state.error = err;
+        })
     }
 })
 
 
-export const { logoutUser, clearAuthError } = AuthSlice.actions;
+export const { logoutUser, clearAuthError, clearUpdateThemeResp } = AuthSlice.actions;
 export default AuthSlice.reducer;

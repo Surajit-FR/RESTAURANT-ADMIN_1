@@ -1,10 +1,10 @@
-interface DeleteConfModalProps {
+interface ConfModalProps {
     modalId: string;
     modalHeading: string;
     onDelete: () => void;
 }
 
-const DeleteConfModal = ({ modalId, modalHeading, onDelete }: DeleteConfModalProps): JSX.Element => {
+const ConfModal = ({ modalId, modalHeading, onDelete }: ConfModalProps): JSX.Element => {
     return (
         <div className="modal fade" id={modalId} tabIndex={-1} aria-labelledby={`${modalId}Label`} aria-hidden="true">
             <div className="modal-dialog modal-dialog-centered">
@@ -23,4 +23,4 @@ const DeleteConfModal = ({ modalId, modalHeading, onDelete }: DeleteConfModalPro
     );
 };
 
-export default DeleteConfModal;
+export default ConfModal;

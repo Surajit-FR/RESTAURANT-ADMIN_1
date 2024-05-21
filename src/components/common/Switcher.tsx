@@ -1,32 +1,55 @@
-import { useEffect, useState } from "react";
+import React, { useEffect } from "react";
+import { DecryptData } from "../../helper/EncryptDecrypt";
+import { useDispatch, useSelector } from "react-redux";
+import { Dispatch } from "redux";
+import { clearUpdateThemeResp, updateTheme } from "../../services/slices/AuthSlice";
 
 const Switcher = (): JSX.Element => {
-    // State to manage the selected theme
-    const [selectedTheme, setSelectedTheme] = useState<string>('semi-dark');
+    const { update_theme_resp } = useSelector((state: any) => state.authSlice);
+    const user: string | null = window.localStorage.getItem("user");
+    const _USER_DATA = DecryptData(user ?? 'null');
 
-    // Function to handle theme change
-    const handleThemeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setSelectedTheme(event.target.id);
+    const token: string | null = window.localStorage.getItem("token");
+    const _TOKEN = JSON.parse(token ?? 'null');
+
+    const header = {
+        headers: {
+            Authorization: `Bearer ${_TOKEN}`
+        }
     };
 
-    // Function to handle header color click
-    const handleHeaderColorClick = (event: React.MouseEvent<HTMLDivElement>) => {
-        const headerColorId = event.currentTarget.id;
-        setSelectedTheme(prevSelectedTheme => {
-            // Remove 'color-header' class from the previous selected theme if present
-            const prevClasses = prevSelectedTheme.split(' ').filter(cls => !cls.startsWith('color-header')).join(' ');
-            // Append 'color-header' class followed by the clicked header color id
-            return `${prevClasses} color-header ${headerColorId}`;
-        });
+    const dispatch: Dispatch<any> = useDispatch();
+
+    // Function to handle theme change
+    const handleThemeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const web_theme = e.target.id;
+        dispatch(updateTheme({ data: { web_theme }, header }));
     };
 
     // Effect to update the class attribute of <html> tag when selectedTheme changes
     useEffect(() => {
         const htmlTag = document.querySelector('html');
         if (htmlTag) {
-            htmlTag.className = selectedTheme;
+            htmlTag.className = _USER_DATA?.web_theme || 'semi-dark';
         }
-    }, [selectedTheme]);
+    }, [_USER_DATA?.web_theme, update_theme_resp]);
+
+    useEffect(() => {
+        return () => {
+            dispatch(clearUpdateThemeResp());
+        }
+    }, [dispatch]);
+
+    const switcherContainer: React.CSSProperties = {
+        position: "fixed",
+        right: "0px",
+        top: "20%",
+        borderTopRightRadius: "0",
+        borderTopLeftRadius: "10px",
+        borderBottomRightRadius: "0",
+        borderBottomLeftRadius: "10px",
+        bottom: "30%"
+    }
 
     return (
         <>
@@ -40,8 +63,13 @@ const Switcher = (): JSX.Element => {
                     aria-controls="offcanvasScrolling"
                 ><i className="bi bi-paint-bucket me-0"></i>
                 </button>
-                <div className="offcanvas offcanvas-end shadow border-start-0 p-2" data-bs-scroll="true" data-bs-backdrop="false"
-                    tabIndex={-1} id="offcanvasScrolling">
+                <div
+                    className="offcanvas offcanvas-end shadow border-start-0 p-2"
+                    data-bs-scroll="true"
+                    data-bs-backdrop="false"
+                    tabIndex={-1} id="offcanvasScrolling"
+                    style={switcherContainer}
+                >
                     <div className="offcanvas-header border-bottom">
                         <h5 className="offcanvas-title" id="offcanvasScrollingLabel">Theme Customizer</h5>
                         <button type="button" className="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
@@ -54,61 +82,61 @@ const Switcher = (): JSX.Element => {
 
                         {/* Light Theme */}
                         <div className="form-check form-check-inline">
-                            <input className="form-check-input" type="radio" name="inlineRadioOptions" id="light-theme" value="option1" onChange={handleThemeChange} />
+                            <input
+                                className="form-check-input"
+                                type="radio"
+                                name="inlineRadioOptions"
+                                id="light-theme"
+                                value="option1"
+                                checked={_USER_DATA?.web_theme === 'light-theme'}
+                                onChange={handleThemeChange}
+                            />
                             <label className="form-check-label" htmlFor="light-theme">Light</label>
                         </div>
 
                         {/* Dark Theme */}
                         <div className="form-check form-check-inline">
-                            <input className="form-check-input" type="radio" name="inlineRadioOptions" id="dark-theme" value="option2" onChange={handleThemeChange} />
+                            <input
+                                className="form-check-input"
+                                type="radio"
+                                name="inlineRadioOptions"
+                                id="dark-theme"
+                                value="option2"
+                                checked={_USER_DATA?.web_theme === 'dark-theme'}
+                                onChange={handleThemeChange}
+                            />
                             <label className="form-check-label" htmlFor="dark-theme">Dark</label>
                         </div>
 
                         {/* Semi Dark Theme */}
                         <div className="form-check form-check-inline">
-                            <input className="form-check-input" type="radio" name="inlineRadioOptions" id="semi-dark" value="option3" defaultChecked onChange={handleThemeChange} />
+                            <input
+                                className="form-check-input"
+                                type="radio"
+                                name="inlineRadioOptions"
+                                id="semi-dark"
+                                value="option3"
+                                checked={_USER_DATA?.web_theme === 'semi-dark'}
+                                onChange={handleThemeChange}
+                            />
                             <label className="form-check-label" htmlFor="semi-dark">Semi Dark</label>
                         </div>
 
                         {/* Minimal Theme */}
                         <hr />
                         <div className="form-check form-check-inline">
-                            <input className="form-check-input" type="radio" name="inlineRadioOptions" id="minimal-theme" value="option3" onChange={handleThemeChange} />
+                            <input
+                                className="form-check-input"
+                                type="radio"
+                                name="inlineRadioOptions"
+                                id="minimal-theme"
+                                value="option3"
+                                checked={_USER_DATA?.web_theme === 'minimal-theme'}
+                                onChange={handleThemeChange}
+                            />
                             <label className="form-check-label" htmlFor="minimal-theme">Minimal Theme</label>
                         </div>
                         <hr />
-
-                        {/* Header Colors */}
-                        <h6 className="mb-0">Header Colors</h6>
-                        <hr />
-                        <div className="header-colors-indigators">
-                            <div className="row row-cols-auto g-3">
-                                <div className="col">
-                                    <div className="indigator headercolor1" id="headercolor1" onClick={handleHeaderColorClick}></div>
-                                </div>
-                                <div className="col">
-                                    <div className="indigator headercolor2" id="headercolor2" onClick={handleHeaderColorClick}></div>
-                                </div>
-                                <div className="col">
-                                    <div className="indigator headercolor3" id="headercolor3" onClick={handleHeaderColorClick}></div>
-                                </div>
-                                <div className="col">
-                                    <div className="indigator headercolor4" id="headercolor4" onClick={handleHeaderColorClick}></div>
-                                </div>
-                                <div className="col">
-                                    <div className="indigator headercolor5" id="headercolor5" onClick={handleHeaderColorClick}></div>
-                                </div>
-                                <div className="col">
-                                    <div className="indigator headercolor6" id="headercolor6" onClick={handleHeaderColorClick}></div>
-                                </div>
-                                <div className="col">
-                                    <div className="indigator headercolor7" id="headercolor7" onClick={handleHeaderColorClick}></div>
-                                </div>
-                                <div className="col">
-                                    <div className="indigator headercolor8" id="headercolor8"></div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>

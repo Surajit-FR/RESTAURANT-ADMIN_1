@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useMemo, useState } from "react";
 import { CategoryListType } from "../../config/DataTypes.config";
 import { deleteCategory, getAllCategory } from "../../services/slices/UtilitySlice";
-import DeleteConfModal from "../../util/DeleteConfModal";
+import ConfModal from "../../util/ConfModal";
 import { REACT_APP_DATA_PER_PAGE } from "../../config/App.config";
 
 const Categories = (): JSX.Element => {
@@ -50,7 +50,7 @@ const Categories = (): JSX.Element => {
     return (
         <>
             {/* Modal */}
-            <DeleteConfModal
+            <ConfModal
                 modalId="deleteModal"
                 modalHeading="Want To Delete The Category?"
                 onDelete={handleDelete}

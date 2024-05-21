@@ -4,13 +4,16 @@ import { useEffect, useMemo, useState } from "react";
 import Product from "../../components/core/products/Product";
 import { useDispatch, useSelector } from "react-redux";
 import { Dispatch } from "redux";
-import { getAllCategory, getAllProduct } from "../../services/slices/UtilitySlice";
+import { clearDelError, clearProductDelResp, deleteProduct, getAllCategory, getAllProduct } from "../../services/slices/UtilitySlice";
 import { CategoryListType, ProductListType } from "../../config/DataTypes.config";
 import { REACT_APP_DATA_PER_PAGE } from "../../config/App.config";
 import Search from "../../components/common/Search";
+import ConfModal from "../../util/ConfModal";
+import CustomAlert from "../../util/CustomAlert";
+import ProductDetailsModal from "../../util/ProductDetailsModal";
 
 const Products = (): JSX.Element => {
-    const { products_data, category_data } = useSelector((state: any) => state.utilitySlice);
+    const { products_data, category_data, del_error, product_del_resp } = useSelector((state: any) => state.utilitySlice);
     const dispatch: Dispatch<any> = useDispatch();
 
     const token: string | null = window.localStorage.getItem("token");
@@ -25,6 +28,7 @@ const Products = (): JSX.Element => {
     const [pageNumber, setPageNumber] = useState<number>(0);
     const [productData, setProductData] = useState<ProductListType[]>([]);
     const [categoryData, setCategoryData] = useState<CategoryListType[]>([]);
+    const [productID, setProductID] = useState<string>("");
 
     // pagination
     const dataPerPage = REACT_APP_DATA_PER_PAGE;
@@ -32,6 +36,12 @@ const Products = (): JSX.Element => {
 
     const changePage = ({ selected }: { selected: number }) => {
         setPageNumber(selected);
+    };
+
+    const handleDelete = () => {
+        if (categoryData) {
+            dispatch(deleteProduct({ product_id: productID, page: (pageNumber + 1), pageSize: dataPerPage, header }));
+        };
     };
 
     useEffect(() => {
@@ -44,8 +54,23 @@ const Products = (): JSX.Element => {
         setCategoryData(category_data?.data);
     }, [products_data, category_data]);
 
+
     return (
         <>
+            {/* Delete Modal */}
+            <ConfModal
+                modalId="deleteModal"
+                modalHeading="Want To Delete The Product?"
+                onDelete={handleDelete}
+            />
+
+            {/* Product Details Modal */}
+            <ProductDetailsModal
+                modalId="productDetails"
+                productID={productID}
+                header={header}
+            />
+
             {/* <!--content--> */}
             <main className="page-content">
 
@@ -83,10 +108,11 @@ const Products = (): JSX.Element => {
                             {/* Search Products */}
                             <div className="col-lg-3 col-md-6 me-auto">
                                 <Search
-                                    placeholder="Search Produts"
+                                    placeholder="Search Products"
                                 />
                             </div>
 
+                            {/* Filter dropdown */}
                             <div className="col-lg-2 col-6 col-md-3">
                                 <select className="form-select">
                                     <option>All category</option>
@@ -100,16 +126,39 @@ const Products = (): JSX.Element => {
 
                         </div>
                     </div>
+
+                    {/* Alert */}
+                    <div className="row d-flex justify-content-center mt-2">
+                        <div className="col-4">
+                            {
+                                del_error?.success === false ?
+                                    <CustomAlert
+                                        type="danger"
+                                        message={del_error?.message}
+                                        onClose={() => dispatch(clearDelError())}
+                                    /> : product_del_resp?.success === true ?
+                                        <CustomAlert
+                                            type="success"
+                                            message={product_del_resp?.message}
+                                            onClose={() => dispatch(clearProductDelResp())}
+                                        /> : null
+                            }
+                        </div>
+                    </div>
+
+                    {/* Products */}
                     <div className="card-body">
                         <div className="product-grid">
                             <div className="row row-cols-1 row-cols-lg-4 row-cols-xl-4 row-cols-xxl-5 g-3">
 
-                                {/* Products */}
+                                {/* Product */}
                                 {productData && productData?.map((item) => {
                                     return (
                                         <Product
                                             key={item?._id}
                                             data={item}
+                                            setProductID={id => setProductID(id)}
+                                            header={header}
                                         />
                                     )
                                 })}

@@ -28,5 +28,5 @@ export const addProductValidationSchema = Yup.object({
     price: Yup.number().required("Price is required").positive("Price must be a positive number"),
     availability: Yup.string().required("Availability selection is required"),
     visibility: Yup.string().required("Visibility selection is required"),
-    categories: Yup.array().min(1, "At least one category is required")
+    category: Yup.string().required("Category selection is required")
 });

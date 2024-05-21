@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { ADDCATEGORY, ADDPRODUCT, DELETECATEGORY, GETALLCATEGORIES, GETALLPRODUCTS } from "../api/Api";
+import { ADDCATEGORY, ADDPRODUCT, DELETECATEGORY, DELETEPRODUCT, GETALLCATEGORIES, GETALLPRODUCTS, GETPRODUCTDETAILS } from "../api/Api";
 import { AddCategorySuccessResponse, AddProductSuccessResponse, FetchAllCategoryResponse, FetchAllProductResponse, FormValues_Props } from "../../config/DataTypes.config";
 
 // addCategory thunk
@@ -62,8 +62,37 @@ export const addProduct = createAsyncThunk("/admin/api/add/new/product", async (
 export const getAllProduct = createAsyncThunk("/admin/api/get/all/product", async ({ page, pageSize, header }: FormValues_Props, { rejectWithValue }): Promise<FetchAllProductResponse | any> => {
     try {
         const response = await GETALLPRODUCTS(page, pageSize, header);
+        const result: FetchAllProductResponse = response?.data;
+        if (result?.success) {
+            return result
+        };
+    } catch (exc: any) {
+        const err: any = rejectWithValue(exc.response.data);
+        return err;
+    }
+});
+
+// getProductDetails thunk
+export const getProductDetails = createAsyncThunk("/admin/api/get/product/details", async ({ product_id, header }: FormValues_Props, { rejectWithValue }): Promise<FetchAllProductResponse | any> => {
+    try {
+        const response = await GETPRODUCTDETAILS(product_id, header);
+        const result: FetchAllProductResponse = response?.data;
+        if (result?.success) {
+            return result
+        };
+    } catch (exc: any) {
+        const err: any = rejectWithValue(exc.response.data);
+        return err;
+    }
+});
+
+// deleteProduct thunk
+export const deleteProduct = createAsyncThunk("/admin/api/delete/product", async ({ product_id, page, pageSize, header }: FormValues_Props, { rejectWithValue, dispatch }): Promise<AddProductSuccessResponse | any> => {
+    try {
+        const response = await DELETEPRODUCT(product_id, header);
         const result: AddProductSuccessResponse = response?.data;
         if (result?.success) {
+            dispatch(getAllProduct({ page, pageSize, header }));
             return result
         };
     } catch (exc: any) {
@@ -79,7 +108,9 @@ const UtilitySlice = createSlice({
         category_del_resp: null,
         category_data: [],
         add_product_resp_data: null,
+        product_del_resp: null,
         products_data: [],
+        products_details_data: [],
         utility_loading: false,
         error: null,
         del_error: null,
@@ -93,6 +124,9 @@ const UtilitySlice = createSlice({
         },
         clearCategoryDelResp(state) {
             state.category_del_resp = null;
+        },
+        clearProductDelResp(state) {
+            state.product_del_resp = null;
         },
         clearError(state) {
             state.error = null;
@@ -176,9 +210,46 @@ const UtilitySlice = createSlice({
             const err: any | null = payload;
             state.error = err;
         })
+
+        // getProductDetails states
+        builder.addCase(getProductDetails.pending, (state) => {
+            state.utility_loading = true;
+        })
+        builder.addCase(getProductDetails.fulfilled, (state, { payload }) => {
+            state.utility_loading = false;
+            const products_details_data: any = payload;
+            state.products_details_data = products_details_data;
+        })
+        builder.addCase(getProductDetails.rejected, (state, { payload }) => {
+            state.utility_loading = false;
+            const err: any | null = payload;
+            state.error = err;
+        })
+
+        // deleteProduct states
+        builder.addCase(deleteProduct.pending, (state) => {
+            state.utility_loading = true;
+        })
+        builder.addCase(deleteProduct.fulfilled, (state, { payload }) => {
+            state.utility_loading = false;
+            const product_del_resp: any = payload;
+            state.product_del_resp = product_del_resp;
+        })
+        builder.addCase(deleteProduct.rejected, (state, { payload }) => {
+            state.utility_loading = false;
+            const err: any | null = payload;
+            state.del_error = err;
+        })
     }
 })
 
 
-export const { clearCategoryRespData, clearAddProductRespData, clearCategoryDelResp, clearError, clearDelError } = UtilitySlice.actions;
+export const {
+    clearCategoryRespData,
+    clearAddProductRespData,
+    clearCategoryDelResp,
+    clearError,
+    clearDelError,
+    clearProductDelResp
+} = UtilitySlice.actions;
 export default UtilitySlice.reducer;
