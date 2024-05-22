@@ -49,6 +49,9 @@ const Product = ({ data, setProductID, header }: DataList_Props): JSX.Element =>
                         <Link
                             to="#"
                             className="btn btn-sm btn-outline-primary"
+                            data-bs-toggle="modal"
+                            data-bs-target="#updateModal"
+                            onClick={() => dispatch(getProductDetails({ product_id: data?._id, header }))}
                         ><i className="bi bi-pencil-fill"></i>Edit
                         </Link>
 

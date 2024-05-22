@@ -11,6 +11,7 @@ import Search from "../../components/common/Search";
 import ConfModal from "../../util/ConfModal";
 import CustomAlert from "../../util/CustomAlert";
 import ProductDetailsModal from "../../util/ProductDetailsModal";
+import UpdateProductModal from "../../util/UpdateProductModal";
 
 const Products = (): JSX.Element => {
     const { products_data, category_data, del_error, product_del_resp } = useSelector((state: any) => state.utilitySlice);
@@ -92,6 +93,13 @@ const Products = (): JSX.Element => {
 
     return (
         <>
+            {/* Product Details Modal */}
+            <UpdateProductModal
+                modalId="updateModal"
+                productID={productID}
+                header={header}
+            />
+
             {/* Delete Modal */}
             <ConfModal
                 modalId="deleteModal"
