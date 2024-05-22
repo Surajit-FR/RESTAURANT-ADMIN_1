@@ -8,6 +8,7 @@ import { Provider } from 'react-redux';
 import { Store } from './services/store/Store';
 import Index from './pages/Index';
 import ProtectedOne from './routes/private/ProtectedOne';
+import { Toaster } from 'react-hot-toast';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -23,6 +24,11 @@ root.render(
         <Route path='/admin/signin' element={<Signin />} />
       </Routes>
     </Router>
+    <Toaster
+      position='top-center'
+      reverseOrder={false}
+      gutter={10}
+    />
   </Provider>
 );
 reportWebVitals();

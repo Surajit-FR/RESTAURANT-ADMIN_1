@@ -27,6 +27,10 @@ export type FormValues_Props = {
     header?: CustomHeadersType | undefined;
     page?: number | undefined;
     pageSize?: number | undefined;
+    search?: string;
+    category?: string;
+    minPrice?: number;
+    maxPrice?: number;
     navigate?: any;
     category_id?: string | undefined;
     product_id?: string | undefined;
@@ -163,5 +167,7 @@ export type FetchAllProductResponse = {
 
 // Search_props_type
 export type Search_props_type = {
-    placeholder: string
-}
+    placeholder: string;
+    value: string;
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+};

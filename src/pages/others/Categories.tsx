@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { CategoryListType } from "../../config/DataTypes.config";
 import { deleteCategory, getAllCategory } from "../../services/slices/UtilitySlice";
 import ConfModal from "../../util/ConfModal";
-import { REACT_APP_DATA_PER_PAGE } from "../../config/App.config";
+import { REACT_APP_CATEGORY_PER_PAGE } from "../../config/App.config";
 
 const Categories = (): JSX.Element => {
     const { category_data } = useSelector((state: any) => state.utilitySlice);
@@ -25,7 +25,7 @@ const Categories = (): JSX.Element => {
     const [categoryID, setCategoryID] = useState<string>('');
     const [categoryData, setCategoryData] = useState<CategoryListType[]>([]);
 
-    const dataPerPage = REACT_APP_DATA_PER_PAGE;
+    const dataPerPage = REACT_APP_CATEGORY_PER_PAGE;
     const pageCount = category_data?.totalPages;
 
     const changePage = ({ selected }: { selected: number }) => {

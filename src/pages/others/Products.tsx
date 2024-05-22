@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Dispatch } from "redux";
 import { clearDelError, clearProductDelResp, deleteProduct, getAllCategory, getAllProduct } from "../../services/slices/UtilitySlice";
 import { CategoryListType, ProductListType } from "../../config/DataTypes.config";
-import { REACT_APP_DATA_PER_PAGE } from "../../config/App.config";
+import { REACT_APP_PRODUCT_PER_PAGE } from "../../config/App.config";
 import Search from "../../components/common/Search";
 import ConfModal from "../../util/ConfModal";
 import CustomAlert from "../../util/CustomAlert";
@@ -29,9 +29,12 @@ const Products = (): JSX.Element => {
     const [productData, setProductData] = useState<ProductListType[]>([]);
     const [categoryData, setCategoryData] = useState<CategoryListType[]>([]);
     const [productID, setProductID] = useState<string>("");
+    const [searchQuery, setSearchQuery] = useState<string>("");
+    const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
+    const [selectedCategory, setSelectedCategory] = useState<string>("");
 
-    // pagination
-    const dataPerPage = REACT_APP_DATA_PER_PAGE;
+    // Pagination
+    const dataPerPage = REACT_APP_PRODUCT_PER_PAGE;
     const pageCount = products_data?.totalPages;
 
     const changePage = ({ selected }: { selected: number }) => {
@@ -40,14 +43,46 @@ const Products = (): JSX.Element => {
 
     const handleDelete = () => {
         if (categoryData) {
-            dispatch(deleteProduct({ product_id: productID, page: (pageNumber + 1), pageSize: dataPerPage, header }));
+            dispatch(deleteProduct({
+                product_id: productID,
+                page: (pageNumber + 1),
+                pageSize: dataPerPage,
+                search: debouncedSearchQuery,
+                category: selectedCategory,
+                header
+            }));
         };
     };
 
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchQuery(e.target.value);
+    };
+
+    const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setSelectedCategory(e.target.value);
+    };
+
+    // Debounce logic for search input
     useEffect(() => {
-        dispatch(getAllProduct({ page: (pageNumber + 1), pageSize: dataPerPage, header }));
+        const handler = setTimeout(() => {
+            setDebouncedSearchQuery(searchQuery);
+        }, 600);
+
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [searchQuery]);
+
+    useEffect(() => {
+        dispatch(getAllProduct({
+            page: (pageNumber + 1),
+            pageSize: dataPerPage,
+            search: debouncedSearchQuery,
+            category: selectedCategory,
+            header
+        }));
         dispatch(getAllCategory({ header }));
-    }, [dispatch, dataPerPage, header, pageNumber]);
+    }, [dispatch, dataPerPage, header, pageNumber, debouncedSearchQuery, selectedCategory]);
 
     useEffect(() => {
         setProductData(products_data?.data);
@@ -109,13 +144,15 @@ const Products = (): JSX.Element => {
                             <div className="col-lg-3 col-md-6 me-auto">
                                 <Search
                                     placeholder="Search Products"
+                                    value={searchQuery}
+                                    onChange={handleSearchChange}
                                 />
                             </div>
 
                             {/* Filter dropdown */}
                             <div className="col-lg-2 col-6 col-md-3">
-                                <select className="form-select">
-                                    <option>All category</option>
+                                <select className="form-select" value={selectedCategory} onChange={handleCategoryChange}>
+                                    <option value="">All categories</option>
                                     {categoryData && categoryData.map((item) => {
                                         return (
                                             <option key={item?.categoryID} value={item?._id}>{item?.category_name}</option>

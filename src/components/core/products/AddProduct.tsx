@@ -218,8 +218,10 @@ const AddProduct = () => {
                                                             alt="Product Preview"
                                                             style={{
                                                                 maxWidth: "100%",
+                                                                maxHeight: "380px",
                                                                 margin: "10px 0",
-                                                                border: "1px solid black"
+                                                                border: "1px solid black",
+                                                                objectFit: "contain"
                                                             }}
                                                         />
                                                     }

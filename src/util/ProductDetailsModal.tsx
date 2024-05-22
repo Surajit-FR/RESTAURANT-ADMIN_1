@@ -30,8 +30,6 @@ const ProductDetailsModal = ({ modalId, productID, header }: ProductDetailsModal
         borderRadius: "5px",
     };
 
-    console.log(products_details_data);
-
 
     return (
         <>

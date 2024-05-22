@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { addCategory, clearCategoryRespData, clearError } from "../../../services/slices/UtilitySlice";
 import { useEffect } from "react";
 import { Pagination_Type } from "../../../config/DataTypes.config";
-import { REACT_APP_DATA_PER_PAGE } from "../../../config/App.config";
+import { REACT_APP_PRODUCT_PER_PAGE } from "../../../config/App.config";
 
 const AddCategory = ({ pageNumber }: Pagination_Type): JSX.Element => {
     const { category_resp_data, error } = useSelector((state: any) => state.utilitySlice);
@@ -22,7 +22,7 @@ const AddCategory = ({ pageNumber }: Pagination_Type): JSX.Element => {
     };
 
     // dataPerPage
-    const dataPerPage = REACT_APP_DATA_PER_PAGE;
+    const dataPerPage = REACT_APP_PRODUCT_PER_PAGE;
 
     // taking form values
     const { values, errors, touched, handleBlur, handleChange, handleSubmit, isValid, resetForm } = useFormik({

@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { ADDCATEGORY, ADDPRODUCT, DELETECATEGORY, DELETEPRODUCT, GETALLCATEGORIES, GETALLPRODUCTS, GETPRODUCTDETAILS } from "../api/Api";
 import { AddCategorySuccessResponse, AddProductSuccessResponse, FetchAllCategoryResponse, FetchAllProductResponse, FormValues_Props } from "../../config/DataTypes.config";
+import toast from "react-hot-toast";
 
 // addCategory thunk
 export const addCategory = createAsyncThunk("/admin/api/add/new/category", async ({ data, page, pageSize, header }: FormValues_Props, { rejectWithValue, dispatch }): Promise<AddCategorySuccessResponse | any> => {
@@ -59,15 +60,29 @@ export const addProduct = createAsyncThunk("/admin/api/add/new/product", async (
 });
 
 // getAllProduct thunk
-export const getAllProduct = createAsyncThunk("/admin/api/get/all/product", async ({ page, pageSize, header }: FormValues_Props, { rejectWithValue }): Promise<FetchAllProductResponse | any> => {
+export const getAllProduct = createAsyncThunk("/admin/api/get/all/product", async (params: FormValues_Props, { rejectWithValue }): Promise<FetchAllProductResponse | any> => {
     try {
-        const response = await GETALLPRODUCTS(page, pageSize, header);
+        const { page, pageSize, search, category, header } = params;
+        const response = await GETALLPRODUCTS({ page, pageSize, search, category }, header);
         const result: FetchAllProductResponse = response?.data;
         if (result?.success) {
             return result
         };
     } catch (exc: any) {
         const err: any = rejectWithValue(exc.response.data);
+        if (err?.payload) {
+            toast.error(err?.payload, {
+                duration: 4000,
+                style: {
+                    background: "#000",
+                    color: "#fff"
+                },
+                iconTheme: {
+                    primary: "#f00",
+                    secondary: "#fff"
+                }
+            });
+        };
         return err;
     }
 });
@@ -87,12 +102,13 @@ export const getProductDetails = createAsyncThunk("/admin/api/get/product/detail
 });
 
 // deleteProduct thunk
-export const deleteProduct = createAsyncThunk("/admin/api/delete/product", async ({ product_id, page, pageSize, header }: FormValues_Props, { rejectWithValue, dispatch }): Promise<AddProductSuccessResponse | any> => {
+export const deleteProduct = createAsyncThunk("/admin/api/delete/product", async (params: FormValues_Props, { rejectWithValue, dispatch }): Promise<AddProductSuccessResponse | any> => {
     try {
+        const { page, pageSize, search, category, product_id, header } = params;
         const response = await DELETEPRODUCT(product_id, header);
         const result: AddProductSuccessResponse = response?.data;
         if (result?.success) {
-            dispatch(getAllProduct({ page, pageSize, header }));
+            dispatch(getAllProduct({ page, pageSize, search, category, header }));
             return result
         };
     } catch (exc: any) {

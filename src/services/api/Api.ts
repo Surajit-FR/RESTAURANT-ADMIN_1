@@ -17,7 +17,10 @@ export const DELETECATEGORY = (category_id: string | undefined, header: CustomHe
 // Add product
 export const ADDPRODUCT = (data: formValuesType | FormData | undefined, header: CustomHeadersType | undefined) => API.post("/admin/api/add/new/product", data, header);
 // Get all products
-export const GETALLPRODUCTS = (page?: number | undefined, pageSize?: number | undefined, header?: CustomHeadersType | undefined) => API.get(`/admin/api/get/all/product?page=${page}&pageSize=${pageSize}`, header);
+export const GETALLPRODUCTS = (params = {}, header: CustomHeadersType | undefined) => {
+    const queryParams = new URLSearchParams(params).toString();
+    return API.get(`/admin/api/get/all/product?${queryParams}`, header);
+};
 // Get product details
 export const GETPRODUCTDETAILS = (product_id: string | undefined, header: CustomHeadersType | undefined) => API.get(`/admin/api/get/product/details/${product_id}`, header);
 // Delete products
