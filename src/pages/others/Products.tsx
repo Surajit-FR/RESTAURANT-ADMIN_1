@@ -96,7 +96,10 @@ const Products = (): JSX.Element => {
             {/* Product Details Modal */}
             <UpdateProductModal
                 modalId="updateModal"
-                productID={productID}
+                pageNumber={pageNumber}
+                dataPerPage={dataPerPage}
+                debouncedSearchQuery={debouncedSearchQuery}
+                selectedCategory={selectedCategory}
                 header={header}
             />
 

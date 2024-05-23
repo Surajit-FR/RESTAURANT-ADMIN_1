@@ -16,6 +16,8 @@ export const GETALLCATEGORIES = (page?: number | undefined, pageSize?: number | 
 export const DELETECATEGORY = (category_id: string | undefined, header: CustomHeadersType | undefined) => API.delete(`/admin/api/delete/category/${category_id}`, header);
 // Add product
 export const ADDPRODUCT = (data: formValuesType | FormData | undefined, header: CustomHeadersType | undefined) => API.post("/admin/api/add/new/product", data, header);
+// Update product
+export const UPDATEPRODUCT = (data: formValuesType | FormData | undefined, product_id: string | undefined, header: CustomHeadersType | undefined) => API.post(`/admin/api/update/product/${product_id}`, data, header);
 // Get all products
 export const GETALLPRODUCTS = (params = {}, header: CustomHeadersType | undefined) => {
     const queryParams = new URLSearchParams(params).toString();

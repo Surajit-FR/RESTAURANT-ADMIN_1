@@ -3,18 +3,21 @@ import { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import { CategoryListType, CustomHeadersType } from "../config/DataTypes.config";
 import { addProductValidationSchema } from "../helper/FormValidation";
-import { clearAddProductRespData, clearError, getAllCategory } from "../services/slices/UtilitySlice";
+import { clearError, clearUpdateProductRespData, getAllCategory, updateProduct } from "../services/slices/UtilitySlice";
 import CustomAlert from "./CustomAlert";
 import { REACT_APP_BASE_URL } from "../config/App.config";
 
 interface ProductDetailsModalProps {
     modalId: string;
-    productID: string;
+    pageNumber: number;
+    dataPerPage: number;
+    debouncedSearchQuery: string,
+    selectedCategory: string,
     header: CustomHeadersType | undefined
 }
 
-const UpdateProductModal = ({ modalId, productID, header }: ProductDetailsModalProps) => {
-    const { category_data, add_product_resp_data, products_details_data, error } = useSelector((state: any) => state.utilitySlice);
+const UpdateProductModal = ({ modalId, pageNumber, dataPerPage, debouncedSearchQuery, selectedCategory, header }: ProductDetailsModalProps) => {
+    const { category_data, update_product_resp_data, products_details_data, error } = useSelector((state: any) => state.utilitySlice);
     const dispatch: any = useDispatch();
 
     const [categoryData, setCategoryData] = useState<CategoryListType[]>([]);
@@ -47,17 +50,26 @@ const UpdateProductModal = ({ modalId, productID, header }: ProductDetailsModalP
             formData.append("productTitle", values.productTitle);
             formData.append("offer", values.offer.toString());
             formData.append("offerPercentage", values.offerPercentage);
-            if (values.productImage !== null) {
-                formData.append("productImage", values.productImage);
-            }
             formData.append("productDescription", values.productDescription);
             formData.append("price", values.price);
             formData.append("availability", values.availability);
             formData.append("visibility", values.visibility);
             formData.append("category", values.category);
 
-            // dispatch(addProduct({ data: formData, header }));
-            console.log({ data: values });
+            // Only append the productImage file if it's a new file, not the existing image URL
+            if (values.productImage && typeof values.productImage !== 'string') {
+                formData.append("productImage", values.productImage);
+            }
+
+            dispatch(updateProduct({
+                data: formData,
+                product_id: products_details_data?.data?._id,
+                page: (pageNumber + 1),
+                pageSize: dataPerPage,
+                search: debouncedSearchQuery,
+                category: selectedCategory,
+                header
+            }));
         }
     });
 
@@ -70,11 +82,11 @@ const UpdateProductModal = ({ modalId, productID, header }: ProductDetailsModalP
     }, [category_data]);
 
     useEffect(() => {
-        if (add_product_resp_data?.success) {
+        if (update_product_resp_data?.success) {
             resetForm();
             setImagePreview(null);
         }
-    }, [add_product_resp_data, resetForm]);
+    }, [update_product_resp_data, resetForm]);
 
     useEffect(() => {
         if (products_details_data?.data) {
@@ -122,11 +134,11 @@ const UpdateProductModal = ({ modalId, productID, header }: ProductDetailsModalP
                                                     type="danger"
                                                     message={error?.message}
                                                     onClose={() => dispatch(clearError())}
-                                                /> : add_product_resp_data?.success === true ?
+                                                /> : update_product_resp_data?.success === true ?
                                                     <CustomAlert
                                                         type="success"
-                                                        message={add_product_resp_data?.message}
-                                                        onClose={() => dispatch(clearAddProductRespData())}
+                                                        message={update_product_resp_data?.message}
+                                                        onClose={() => dispatch(clearUpdateProductRespData())}
                                                     /> : null
                                         }
                                     </div>

@@ -48,6 +48,12 @@ export type AddProductSuccessResponse = {
     success: boolean;
 };
 
+// Update Product success resp type
+export type UpdateProductSuccessResponse = {
+    message: string;
+    success: boolean;
+};
+
 // Signin input type
 export type signinInputValues = {
     credential?: string;

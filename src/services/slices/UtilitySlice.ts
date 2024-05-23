@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { ADDCATEGORY, ADDPRODUCT, DELETECATEGORY, DELETEPRODUCT, GETALLCATEGORIES, GETALLPRODUCTS, GETPRODUCTDETAILS } from "../api/Api";
-import { AddCategorySuccessResponse, AddProductSuccessResponse, FetchAllCategoryResponse, FetchAllProductResponse, FormValues_Props } from "../../config/DataTypes.config";
+import { ADDCATEGORY, ADDPRODUCT, DELETECATEGORY, DELETEPRODUCT, GETALLCATEGORIES, GETALLPRODUCTS, GETPRODUCTDETAILS, UPDATEPRODUCT } from "../api/Api";
+import { AddCategorySuccessResponse, AddProductSuccessResponse, FetchAllCategoryResponse, FetchAllProductResponse, FormValues_Props, UpdateProductSuccessResponse } from "../../config/DataTypes.config";
 import toast from "react-hot-toast";
 
 // addCategory thunk
@@ -51,6 +51,22 @@ export const addProduct = createAsyncThunk("/admin/api/add/new/product", async (
         const response = await ADDPRODUCT(data, header);
         const result: AddProductSuccessResponse = response?.data;
         if (result?.success) {
+            return result
+        };
+    } catch (exc: any) {
+        const err: any = rejectWithValue(exc.response.data);
+        return err;
+    }
+});
+
+// updateProduct thunk
+export const updateProduct = createAsyncThunk("/admin/api/update/product/", async (params: FormValues_Props, { rejectWithValue, dispatch }): Promise<UpdateProductSuccessResponse | any> => {
+    try {
+        const { data, page, pageSize, search, category, product_id, header } = params;
+        const response = await UPDATEPRODUCT(data, product_id, header);
+        const result: UpdateProductSuccessResponse = response?.data;
+        if (result?.success) {
+            dispatch(getAllProduct({ page, pageSize, search, category, header }));
             return result
         };
     } catch (exc: any) {
@@ -124,6 +140,7 @@ const UtilitySlice = createSlice({
         category_del_resp: null,
         category_data: [],
         add_product_resp_data: null,
+        update_product_resp_data: null,
         product_del_resp: null,
         products_data: [],
         products_details_data: [],
@@ -137,6 +154,9 @@ const UtilitySlice = createSlice({
         },
         clearAddProductRespData(state) {
             state.add_product_resp_data = null;
+        },
+        clearUpdateProductRespData(state) {
+            state.update_product_resp_data = null;
         },
         clearCategoryDelResp(state) {
             state.category_del_resp = null;
@@ -215,6 +235,21 @@ const UtilitySlice = createSlice({
             state.error = err;
         })
 
+        // updateProduct states
+        builder.addCase(updateProduct.pending, (state) => {
+            state.utility_loading = true;
+        })
+        builder.addCase(updateProduct.fulfilled, (state, { payload }) => {
+            state.utility_loading = false;
+            const update_product_resp_data: any = payload;
+            state.update_product_resp_data = update_product_resp_data;
+        })
+        builder.addCase(updateProduct.rejected, (state, { payload }) => {
+            state.utility_loading = false;
+            const err: any | null = payload;
+            state.error = err;
+        })
+
         // getAllProduct states
         builder.addCase(getAllProduct.pending, (state) => {
             state.utility_loading = true;
@@ -266,6 +301,7 @@ const UtilitySlice = createSlice({
 export const {
     clearCategoryRespData,
     clearAddProductRespData,
+    clearUpdateProductRespData,
     clearCategoryDelResp,
     clearError,
     clearDelError,
