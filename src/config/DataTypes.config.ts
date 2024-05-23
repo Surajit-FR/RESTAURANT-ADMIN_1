@@ -1,3 +1,5 @@
+import { ReactNode } from "react";
+
 // Header type
 export type CustomHeadersType = {
     headers: {
@@ -37,19 +39,25 @@ export type FormValues_Props = {
 };
 
 // Add category success resp type
-export type AddCategorySuccessResponse = {
+type AddCategorySuccessResponse = {
+    message: string;
+    success: boolean;
+};
+
+// Update category success resp type
+type UpdateCategorySuccessResponse = {
     message: string;
     success: boolean;
 };
 
 // Add Product success resp type
-export type AddProductSuccessResponse = {
+type AddProductSuccessResponse = {
     message: string;
     success: boolean;
 };
 
 // Update Product success resp type
-export type UpdateProductSuccessResponse = {
+type UpdateProductSuccessResponse = {
     message: string;
     success: boolean;
 };
@@ -87,7 +95,7 @@ export type Role = {
 };
 
 // Define the type for the login success response
-export type LoginSuccessResponse = {
+type LoginSuccessResponse = {
     data: {
         _id: string;
         full_name: string;
@@ -139,7 +147,7 @@ export type CategoryListType = {
     __v: string;
 };
 
-// Promise retun type FetchAllCategoryResponse
+// Promise return type FetchAllCategoryResponse
 export type FetchAllCategoryResponse = {
     data: [CategoryListType];
     message: string;
@@ -147,7 +155,7 @@ export type FetchAllCategoryResponse = {
 };
 
 // Product list type
-export type ProductListType = {
+type ProductListType = {
     _id: string;
     productTitle: string;
     offer: string;
@@ -164,7 +172,7 @@ export type ProductListType = {
     __v: string;
 };
 
-// Promise retun type FetchAllProductResponse
+// Promise return type FetchAllProductResponse
 export type FetchAllProductResponse = {
     data: [ProductListType];
     message: string;
@@ -177,3 +185,31 @@ export type Search_props_type = {
     value: string;
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
+
+// Common response type
+export interface ApiResponse<T> {
+    productImage: string;
+    productTitle: ReactNode;
+    price(price: any): unknown;
+    category_name: ReactNode;
+    _id: string;
+    token(token: any): string;
+    message: string;
+    success: boolean;
+    data: T;
+}
+
+// Common response type for category operations
+export type CategoryResponse = ApiResponse<Array<CategoryListType>>;
+
+// Common response type for product operations
+export type ProductResponse = ApiResponse<Array<ProductListType>>;
+
+// Common response type for authentication
+export type AuthResponse = ApiResponse<LoginSuccessResponse['data']>;
+
+// Common response type for adding or updating categories
+export type CategoryOperationResponse = ApiResponse<AddCategorySuccessResponse | UpdateCategorySuccessResponse>;
+
+// Common response type for adding or updating products
+export type ProductOperationResponse = ApiResponse<AddProductSuccessResponse | UpdateProductSuccessResponse>;

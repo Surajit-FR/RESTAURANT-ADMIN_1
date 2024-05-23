@@ -25,6 +25,7 @@
     "formik": "^2.4.6",
     "jquery": "^3.7.1",
     "js-cookie": "^3.0.5",
+    "jwt-decode": "^4.0.0",
     "metismenu": "^3.0.7",
     "pace-js": "^1.2.4",
     "perfect-scrollbar": "^1.5.5",

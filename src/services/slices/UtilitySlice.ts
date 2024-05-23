@@ -1,13 +1,27 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { ADDCATEGORY, ADDPRODUCT, DELETECATEGORY, DELETEPRODUCT, GETALLCATEGORIES, GETALLPRODUCTS, GETPRODUCTDETAILS, UPDATEPRODUCT } from "../api/Api";
-import { AddCategorySuccessResponse, AddProductSuccessResponse, FetchAllCategoryResponse, FetchAllProductResponse, FormValues_Props, UpdateProductSuccessResponse } from "../../config/DataTypes.config";
-import toast from "react-hot-toast";
+import { ADDCATEGORY, ADDPRODUCT, DELETECATEGORY, DELETEPRODUCT, GETALLCATEGORIES, GETALLPRODUCTS, GETPRODUCTDETAILS, UPDATECATEGORY, UPDATEPRODUCT } from "../api/Api";
+import { CategoryOperationResponse, ProductOperationResponse, FetchAllCategoryResponse, FetchAllProductResponse, FormValues_Props } from "../../config/DataTypes.config";
 
 // addCategory thunk
-export const addCategory = createAsyncThunk("/admin/api/add/new/category", async ({ data, page, pageSize, header }: FormValues_Props, { rejectWithValue, dispatch }): Promise<AddCategorySuccessResponse | any> => {
+export const addCategory = createAsyncThunk("/admin/api/add/new/category", async ({ data, page, pageSize, header }: FormValues_Props, { rejectWithValue, dispatch }): Promise<CategoryOperationResponse | any> => {
     try {
         const response = await ADDCATEGORY(data, header);
-        const result: AddCategorySuccessResponse = response?.data;
+        const result: CategoryOperationResponse = response?.data;
+        if (result?.success) {
+            dispatch(getAllCategory({ page, pageSize, header }));
+            return result
+        };
+    } catch (exc: any) {
+        const err: any = rejectWithValue(exc.response.data);
+        return err;
+    }
+});
+
+// updateCategory thunk
+export const updateCategory = createAsyncThunk("/admin/api/update/category", async ({ data, page, pageSize, category_id, header }: FormValues_Props, { rejectWithValue, dispatch }): Promise<CategoryOperationResponse | any> => {
+    try {
+        const response = await UPDATECATEGORY(data, category_id, header);
+        const result: CategoryOperationResponse = response?.data;
         if (result?.success) {
             dispatch(getAllCategory({ page, pageSize, header }));
             return result
@@ -46,10 +60,10 @@ export const deleteCategory = createAsyncThunk("/admin/api/delete/category", asy
 });
 
 // addProduct thunk
-export const addProduct = createAsyncThunk("/admin/api/add/new/product", async ({ data, header }: FormValues_Props, { rejectWithValue }): Promise<AddProductSuccessResponse | any> => {
+export const addProduct = createAsyncThunk("/admin/api/add/new/product", async ({ data, header }: FormValues_Props, { rejectWithValue }): Promise<ProductOperationResponse | any> => {
     try {
         const response = await ADDPRODUCT(data, header);
-        const result: AddProductSuccessResponse = response?.data;
+        const result: ProductOperationResponse = response?.data;
         if (result?.success) {
             return result
         };
@@ -60,11 +74,11 @@ export const addProduct = createAsyncThunk("/admin/api/add/new/product", async (
 });
 
 // updateProduct thunk
-export const updateProduct = createAsyncThunk("/admin/api/update/product/", async (params: FormValues_Props, { rejectWithValue, dispatch }): Promise<UpdateProductSuccessResponse | any> => {
+export const updateProduct = createAsyncThunk("/admin/api/update/product/", async (params: FormValues_Props, { rejectWithValue, dispatch }): Promise<ProductOperationResponse | any> => {
     try {
         const { data, page, pageSize, search, category, product_id, header } = params;
         const response = await UPDATEPRODUCT(data, product_id, header);
-        const result: UpdateProductSuccessResponse = response?.data;
+        const result: ProductOperationResponse = response?.data;
         if (result?.success) {
             dispatch(getAllProduct({ page, pageSize, search, category, header }));
             return result
@@ -86,19 +100,6 @@ export const getAllProduct = createAsyncThunk("/admin/api/get/all/product", asyn
         };
     } catch (exc: any) {
         const err: any = rejectWithValue(exc.response.data);
-        if (err?.payload) {
-            toast.error(err?.payload, {
-                duration: 4000,
-                style: {
-                    background: "#000",
-                    color: "#fff"
-                },
-                iconTheme: {
-                    primary: "#f00",
-                    secondary: "#fff"
-                }
-            });
-        };
         return err;
     }
 });
@@ -118,11 +119,11 @@ export const getProductDetails = createAsyncThunk("/admin/api/get/product/detail
 });
 
 // deleteProduct thunk
-export const deleteProduct = createAsyncThunk("/admin/api/delete/product", async (params: FormValues_Props, { rejectWithValue, dispatch }): Promise<AddProductSuccessResponse | any> => {
+export const deleteProduct = createAsyncThunk("/admin/api/delete/product", async (params: FormValues_Props, { rejectWithValue, dispatch }): Promise<ProductOperationResponse | any> => {
     try {
         const { page, pageSize, search, category, product_id, header } = params;
         const response = await DELETEPRODUCT(product_id, header);
-        const result: AddProductSuccessResponse = response?.data;
+        const result: ProductOperationResponse = response?.data;
         if (result?.success) {
             dispatch(getAllProduct({ page, pageSize, search, category, header }));
             return result
@@ -136,42 +137,57 @@ export const deleteProduct = createAsyncThunk("/admin/api/delete/product", async
 const UtilitySlice = createSlice({
     name: "utilitySlice",
     initialState: {
+        // Category States
         category_resp_data: null,
         category_del_resp: null,
         category_data: [],
+        update_category_resp_data: null,
+        update_cat_error: null,
+
+        // Product States
         add_product_resp_data: null,
         update_product_resp_data: null,
         product_del_resp: null,
         products_data: [],
         products_details_data: [],
+        del_error: null,
+
+        // Common States
         utility_loading: false,
         error: null,
-        del_error: null,
     },
     reducers: {
         clearCategoryRespData(state) {
             state.category_resp_data = null;
         },
+        clearUpdateCategoryRespData(state) {
+            state.update_category_resp_data = null;
+        },
+        clearCategoryDelResp(state) {
+            state.category_del_resp = null;
+        },
+        clearCatError(state) {
+            state.update_cat_error = null;
+        },
+
         clearAddProductRespData(state) {
             state.add_product_resp_data = null;
         },
         clearUpdateProductRespData(state) {
             state.update_product_resp_data = null;
         },
-        clearCategoryDelResp(state) {
-            state.category_del_resp = null;
-        },
         clearProductDelResp(state) {
             state.product_del_resp = null;
         },
-        clearError(state) {
-            state.error = null;
+        clearProductsDetailsData(state) {
+            state.products_details_data = [];
         },
         clearDelError(state) {
             state.del_error = null;
         },
-        clearProductsDetailsData(state) {
-            state.products_details_data = [];
+
+        clearError(state) {
+            state.error = null;
         },
     },
     extraReducers: builder => {
@@ -188,6 +204,21 @@ const UtilitySlice = createSlice({
             state.utility_loading = false;
             const err: any | null = payload;
             state.error = err;
+        })
+
+        // updateCategory states
+        builder.addCase(updateCategory.pending, (state) => {
+            state.utility_loading = true;
+        })
+        builder.addCase(updateCategory.fulfilled, (state, { payload }) => {
+            state.utility_loading = false;
+            const update_category_resp_data: any = payload;
+            state.update_category_resp_data = update_category_resp_data;
+        })
+        builder.addCase(updateCategory.rejected, (state, { payload }) => {
+            state.utility_loading = false;
+            const err: any | null = payload;
+            state.update_cat_error = err;
         })
 
         // getAllCategory states
@@ -300,12 +331,16 @@ const UtilitySlice = createSlice({
 
 export const {
     clearCategoryRespData,
+    clearUpdateCategoryRespData,
+    clearCatError,
+    clearCategoryDelResp,
+
     clearAddProductRespData,
     clearUpdateProductRespData,
-    clearCategoryDelResp,
-    clearError,
-    clearDelError,
     clearProductDelResp,
     clearProductsDetailsData,
+    clearDelError,
+
+    clearError,
 } = UtilitySlice.actions;
 export default UtilitySlice.reducer;

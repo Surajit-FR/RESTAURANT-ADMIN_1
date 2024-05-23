@@ -1,14 +1,14 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { LOGIN, UPDATETHEME } from "../api/Api";
-import { FormValues_Props, LoginSuccessResponse, UserAuth_Props } from "../../config/DataTypes.config";
+import { FormValues_Props, AuthResponse, UserAuth_Props } from "../../config/DataTypes.config";
 import { EncryptData } from "../../helper/EncryptDecrypt";
 import Cookies from 'js-cookie';
 
 // loginUser thunk
-export const loginUser = createAsyncThunk("/api/login", async ({ data, navigate }: UserAuth_Props, { rejectWithValue }): Promise<LoginSuccessResponse | any> => {
+export const loginUser = createAsyncThunk("/api/login", async ({ data, navigate }: UserAuth_Props, { rejectWithValue }): Promise<AuthResponse | any> => {
     try {
         const response = await LOGIN(data);
-        const result: LoginSuccessResponse = response?.data;
+        const result: AuthResponse = response?.data;
         if (result?.success) {
             if (result?.data?.remember_me === true) {
                 const encUserData = EncryptData(data);
@@ -32,10 +32,10 @@ export const loginUser = createAsyncThunk("/api/login", async ({ data, navigate 
 });
 
 // updateTheme thunk
-export const updateTheme = createAsyncThunk("/api/update/theme", async ({ data, header }: FormValues_Props, { rejectWithValue }): Promise<LoginSuccessResponse | any> => {
+export const updateTheme = createAsyncThunk("/api/update/theme", async ({ data, header }: FormValues_Props, { rejectWithValue }): Promise<AuthResponse | any> => {
     try {
         const response = await UPDATETHEME(data, header);
-        const result: LoginSuccessResponse = response?.data;
+        const result: AuthResponse = response?.data;
         if (result?.success) {
             if (result?.data?.remember_me === true) {
                 const encUserData = EncryptData(data);

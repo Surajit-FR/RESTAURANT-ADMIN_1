@@ -7,6 +7,7 @@ import { CategoryListType } from "../../config/DataTypes.config";
 import { deleteCategory, getAllCategory } from "../../services/slices/UtilitySlice";
 import ConfModal from "../../util/ConfModal";
 import { REACT_APP_CATEGORY_PER_PAGE } from "../../config/App.config";
+import UpdateCategoryModal from "../../util/UpdateCategoryModal";
 
 const Categories = (): JSX.Element => {
     const { category_data } = useSelector((state: any) => state.utilitySlice);
@@ -38,6 +39,10 @@ const Categories = (): JSX.Element => {
         }
     };
 
+    const selectedCategory = useMemo(() => {
+        return categoryData?.find(category => category?._id === categoryID);
+    }, [categoryID, categoryData]);
+
     useEffect(() => {
         dispatch(getAllCategory({ page: (pageNumber + 1), pageSize: dataPerPage, header }));
     }, [dispatch, header, pageNumber, dataPerPage]);
@@ -46,10 +51,18 @@ const Categories = (): JSX.Element => {
         setCategoryData(category_data?.data);
     }, [category_data]);
 
-
     return (
         <>
-            {/* Modal */}
+            {/* Update Modal */}
+            <UpdateCategoryModal
+                pageNumber={pageNumber}
+                modalId="updateCategoryModal"
+                dataPerPage={dataPerPage}
+                header={header}
+                categoryData={selectedCategory}
+            />
+
+            {/* Delete Modal */}
             <ConfModal
                 modalId="deleteModal"
                 modalHeading="Want To Delete The Category?"

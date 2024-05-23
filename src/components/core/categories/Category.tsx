@@ -15,9 +15,7 @@ const Category = ({ data, index, setCategoryID }: DataList_Props): JSX.Element =
             <td>{data?.category_desc ? data?.category_desc : "N/A"}</td>
             <td>
                 <div className="d-flex align-items-center gap-3 fs-6">
-                    <Link to="#" className="text-warning" data-bs-toggle="tooltip"
-                        data-bs-placement="bottom" title="Edit info"
-                        aria-label="Edit">
+                    <Link to="#" className="text-warning" data-bs-toggle="modal" data-bs-target="#updateCategoryModal" onClick={() => setCategoryID(data._id)}>
                         <i className="bi bi-pencil-fill"></i>
                     </Link>
 

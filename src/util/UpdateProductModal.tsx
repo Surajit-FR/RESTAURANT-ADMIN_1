@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { useFormik } from "formik";
-import { CategoryListType, CustomHeadersType } from "../config/DataTypes.config";
+import { CategoryResponse, CustomHeadersType } from "../config/DataTypes.config";
 import { addProductValidationSchema } from "../helper/FormValidation";
 import { clearError, clearUpdateProductRespData, getAllCategory, updateProduct } from "../services/slices/UtilitySlice";
 import CustomAlert from "./CustomAlert";
@@ -20,7 +20,7 @@ const UpdateProductModal = ({ modalId, pageNumber, dataPerPage, debouncedSearchQ
     const { category_data, update_product_resp_data, products_details_data, error } = useSelector((state: any) => state.utilitySlice);
     const dispatch: any = useDispatch();
 
-    const [categoryData, setCategoryData] = useState<CategoryListType[]>([]);
+    const [categoryData, setCategoryData] = useState<CategoryResponse[]>([]);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
 
     const getImagUrl = (url: string): string => {

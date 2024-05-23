@@ -5,7 +5,7 @@ import Product from "../../components/core/products/Product";
 import { useDispatch, useSelector } from "react-redux";
 import { Dispatch } from "redux";
 import { clearDelError, clearProductDelResp, deleteProduct, getAllCategory, getAllProduct } from "../../services/slices/UtilitySlice";
-import { CategoryListType, ProductListType } from "../../config/DataTypes.config";
+import { CategoryListType, ProductResponse } from "../../config/DataTypes.config";
 import { REACT_APP_PRODUCT_PER_PAGE } from "../../config/App.config";
 import Search from "../../components/common/Search";
 import ConfModal from "../../util/ConfModal";
@@ -27,7 +27,7 @@ const Products = (): JSX.Element => {
     }), [_TOKEN]);
 
     const [pageNumber, setPageNumber] = useState<number>(0);
-    const [productData, setProductData] = useState<ProductListType[]>([]);
+    const [productData, setProductData] = useState<ProductResponse[]>([]);
     const [categoryData, setCategoryData] = useState<CategoryListType[]>([]);
     const [productID, setProductID] = useState<string>("");
     const [searchQuery, setSearchQuery] = useState<string>("");
@@ -82,7 +82,7 @@ const Products = (): JSX.Element => {
             category: selectedCategory,
             header
         }));
-        dispatch(getAllCategory({ header }));
+        dispatch(getAllCategory({ page: (pageNumber + 1), pageSize: dataPerPage, header }));
     }, [dispatch, dataPerPage, header, pageNumber, debouncedSearchQuery, selectedCategory]);
 
     useEffect(() => {
@@ -95,7 +95,7 @@ const Products = (): JSX.Element => {
         <>
             {/* Product Details Modal */}
             <UpdateProductModal
-                modalId="updateModal"
+                modalId="updateProductModal"
                 pageNumber={pageNumber}
                 dataPerPage={dataPerPage}
                 debouncedSearchQuery={debouncedSearchQuery}
@@ -164,7 +164,7 @@ const Products = (): JSX.Element => {
                             <div className="col-lg-2 col-6 col-md-3">
                                 <select className="form-select" value={selectedCategory} onChange={handleCategoryChange}>
                                     <option value="">All categories</option>
-                                    {categoryData && categoryData.map((item) => {
+                                    {categoryData && categoryData?.map((item) => {
                                         return (
                                             <option key={item?.categoryID} value={item?._id}>{item?.category_name}</option>
                                         )

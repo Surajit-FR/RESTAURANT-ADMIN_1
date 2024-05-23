@@ -1,12 +1,12 @@
 import { Link } from "react-router-dom";
-import { CustomHeadersType, ProductListType } from "../../../config/DataTypes.config";
+import { CustomHeadersType, ProductResponse } from "../../../config/DataTypes.config";
 import { REACT_APP_BASE_URL } from "../../../config/App.config";
 import { getProductDetails } from "../../../services/slices/UtilitySlice";
 import { useDispatch } from "react-redux";
 import { Dispatch } from "redux";
 
 type DataList_Props = {
-    data: ProductListType,
+    data: ProductResponse,
     setProductID: (id: string) => void,
     header: CustomHeadersType | undefined
 }
@@ -50,7 +50,7 @@ const Product = ({ data, setProductID, header }: DataList_Props): JSX.Element =>
                             to="#"
                             className="btn btn-sm btn-outline-primary"
                             data-bs-toggle="modal"
-                            data-bs-target="#updateModal"
+                            data-bs-target="#updateProductModal"
                             onClick={() => dispatch(getProductDetails({ product_id: data?._id, header }))}
                         ><i className="bi bi-pencil-fill"></i>Edit
                         </Link>
