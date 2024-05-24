@@ -12,6 +12,8 @@ import ConfModal from "../../util/ConfModal";
 import CustomAlert from "../../util/CustomAlert";
 import ProductDetailsModal from "../../util/ProductDetailsModal";
 import UpdateProductModal from "../../util/UpdateProductModal";
+import { DecryptData } from "../../helper/EncryptDecrypt";
+import { checkPermissions, permissionsToCheck } from "../../helper/CheckPermissions";
 
 const Products = (): JSX.Element => {
     const { products_data, category_data, del_error, product_del_resp } = useSelector((state: any) => state.utilitySlice);
@@ -19,6 +21,8 @@ const Products = (): JSX.Element => {
 
     const token: string | null = window.localStorage.getItem("token");
     const _TOKEN = JSON.parse(token ?? 'null');
+    const user: string | null = window.localStorage.getItem("user");
+    const userData = DecryptData(user ?? 'null');
 
     const header = useMemo(() => ({
         headers: {
@@ -62,6 +66,9 @@ const Products = (): JSX.Element => {
     const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedCategory(e.target.value);
     };
+
+    // permissionCheck
+    const permissionCheckResult = checkPermissions(userData, permissionsToCheck);
 
     // Debounce logic for search input
     useEffect(() => {
@@ -138,10 +145,13 @@ const Products = (): JSX.Element => {
                     <div className="card-body">
                         <div className="row align-items-center">
                             <div className="col-lg-3 col-xl-2">
-                                <Link to="/add/product" className="btn btn-primary mb-3 mb-lg-0">
-                                    <i className="lni lni-plus me-2">
-                                    </i>Add Product
-                                </Link>
+                                {
+                                    (permissionCheckResult?.write_create || permissionCheckResult?.all) &&
+                                    <Link to="/add/product" className="btn btn-primary mb-3 mb-lg-0">
+                                        <i className="lni lni-plus me-2">
+                                        </i>Add Product
+                                    </Link>
+                                }
                             </div>
                         </div>
                     </div>
@@ -207,6 +217,7 @@ const Products = (): JSX.Element => {
                                             data={item}
                                             setProductID={id => setProductID(id)}
                                             header={header}
+                                            userData={userData}
                                         />
                                     )
                                 })}

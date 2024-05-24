@@ -1,3 +1,4 @@
+import { JwtPayload } from "jwt-decode";
 import { ReactNode } from "react";
 
 // Header type
@@ -94,21 +95,30 @@ export type Role = {
     permissions: Permission[];
 };
 
+// PermissionCheckResult type
+export type PermissionCheckResult = {
+    [key: string]: boolean;
+};
+
+// UserData type
+export type UserData = {
+    _id: string;
+    full_name: string;
+    email: string;
+    password: string;
+    role: Role;
+    is_active: boolean;
+    is_delete: boolean;
+    createdAt: string;
+    updatedAt: string;
+    __v: number;
+    web_theme: string;
+    remember_me: boolean;
+}
+
 // Define the type for the login success response
 type LoginSuccessResponse = {
-    data: {
-        _id: string;
-        full_name: string;
-        email: string;
-        password: string;
-        web_theme: string;
-        role: Role;
-        is_active: boolean;
-        is_delete: boolean;
-        remember_me: boolean;
-        createdAt: string;
-        updatedAt: string;
-    };
+    data: UserData;
     message: string;
     success: boolean;
     token: string;
@@ -197,6 +207,21 @@ export interface ApiResponse<T> {
     message: string;
     success: boolean;
     data: T;
+}
+
+// CustomJwtPayload type
+export interface CustomJwtPayload extends JwtPayload {
+    _id?: string;
+    full_name?: string;
+    email?: string;
+    password?: string;
+    web_theme?: string;
+    role?: Role;
+    is_active?: boolean;
+    is_delete?: boolean;
+    remember_me?: boolean;
+    createdAt?: string;
+    updatedAt?: string;
 }
 
 // Common response type for category operations

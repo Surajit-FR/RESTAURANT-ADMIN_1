@@ -25,8 +25,6 @@ const UserDropdown = (): JSX.Element => {
         // { icon: "bi bi-cloud-arrow-down-fill", text: "Downloads", link: "#" }
     ];
 
-    // console.log(_USER_DATA);
-
     return (
         <>
             <li className="nav-item dropdown dropdown-user-setting">

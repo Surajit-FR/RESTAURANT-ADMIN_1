@@ -8,6 +8,8 @@ import { deleteCategory, getAllCategory } from "../../services/slices/UtilitySli
 import ConfModal from "../../util/ConfModal";
 import { REACT_APP_CATEGORY_PER_PAGE } from "../../config/App.config";
 import UpdateCategoryModal from "../../util/UpdateCategoryModal";
+import { DecryptData } from "../../helper/EncryptDecrypt";
+import { checkPermissions, permissionsToCheck } from "../../helper/CheckPermissions";
 
 const Categories = (): JSX.Element => {
     const { category_data } = useSelector((state: any) => state.utilitySlice);
@@ -15,6 +17,8 @@ const Categories = (): JSX.Element => {
 
     const token: string | null = window.localStorage.getItem("token");
     const _TOKEN = JSON.parse(token ?? 'null');
+    const user: string | null = window.localStorage.getItem("user");
+    const userData = DecryptData(user ?? 'null');
 
     const header = useMemo(() => ({
         headers: {
@@ -43,6 +47,9 @@ const Categories = (): JSX.Element => {
         return categoryData?.find(category => category?._id === categoryID);
     }, [categoryID, categoryData]);
 
+    // permissionCheck
+    const permissionCheckResult = checkPermissions(userData, permissionsToCheck);
+
     useEffect(() => {
         dispatch(getAllCategory({ page: (pageNumber + 1), pageSize: dataPerPage, header }));
     }, [dispatch, header, pageNumber, dataPerPage]);
@@ -50,6 +57,9 @@ const Categories = (): JSX.Element => {
     useEffect(() => {
         setCategoryData(category_data?.data);
     }, [category_data]);
+
+    console.log(userData);
+
 
     return (
         <>
@@ -89,11 +99,14 @@ const Categories = (): JSX.Element => {
                     </div>
                     <div className="card-body">
                         <div className="row">
-                            <AddCategory
-                                pageCount={pageCount}
-                                pageNumber={pageNumber}
-                                changePage={changePage}
-                            />
+                            {
+                                (permissionCheckResult?.write_create || permissionCheckResult?.all) &&
+                                <AddCategory
+                                    pageCount={pageCount}
+                                    pageNumber={pageNumber}
+                                    changePage={changePage}
+                                />
+                            }
 
                             <CategoryList
                                 newData={categoryData}
@@ -101,6 +114,7 @@ const Categories = (): JSX.Element => {
                                 pageNumber={pageNumber}
                                 changePage={changePage}
                                 setCategoryID={id => setCategoryID(id)}
+                                permissionCheckResult={permissionCheckResult}
                             />
                         </div>
                     </div>

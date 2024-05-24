@@ -9,6 +9,7 @@ import { Store } from './services/store/Store';
 import Index from './pages/Index';
 import ProtectedOne from './routes/private/ProtectedOne';
 import { Toaster } from 'react-hot-toast';
+import ErrorPage from './components/common/ErrorPage';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -21,6 +22,7 @@ root.render(
           <Route path='*' element={<App />} />
         </Route>
         <Route path='/' element={<Index />} />
+        <Route path='/access/error' element={<ErrorPage />} />
         <Route path='/admin/signin' element={<Signin />} />
       </Routes>
     </Router>

@@ -4,10 +4,15 @@ import CustomAlert from "../../../util/CustomAlert";
 import { useDispatch, useSelector } from "react-redux";
 import { addCategory, clearCategoryRespData, clearError } from "../../../services/slices/UtilitySlice";
 import { useEffect } from "react";
-import { Pagination_Type } from "../../../config/DataTypes.config";
 import { REACT_APP_PRODUCT_PER_PAGE } from "../../../config/App.config";
 
-const AddCategory = ({ pageNumber }: Pagination_Type): JSX.Element => {
+type addCategory_props = {
+    pageCount: number;
+    pageNumber: number;
+    changePage: (data: { selected: number }) => void;
+}
+
+const AddCategory = ({ pageNumber }: addCategory_props): JSX.Element => {
     const { category_resp_data, error } = useSelector((state: any) => state.utilitySlice);
     const dispatch: any = useDispatch();
 

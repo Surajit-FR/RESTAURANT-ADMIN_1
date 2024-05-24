@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { CategoryListType } from '../../../config/DataTypes.config';
+import { CategoryListType, PermissionCheckResult } from '../../../config/DataTypes.config';
 import Pagination from '../../../util/Pagination';
 import Category from './Category';
 import CustomAlert from '../../../util/CustomAlert';
@@ -11,10 +11,11 @@ type categoryList_props = {
     pageCount: number,
     pageNumber: number,
     changePage: (data: { selected: number }) => void,
-    setCategoryID: (id: string) => void
+    setCategoryID: (id: string) => void,
+    permissionCheckResult: PermissionCheckResult,
 }
 
-const CategoryList = ({ newData, pageCount, pageNumber, changePage, setCategoryID }: categoryList_props): JSX.Element => {
+const CategoryList = ({ newData, pageCount, pageNumber, changePage, setCategoryID, permissionCheckResult }: categoryList_props): JSX.Element => {
     const { category_del_resp, del_error } = useSelector((state: any) => state.utilitySlice);
     const dispatch: Dispatch<any> = useDispatch();
 
@@ -44,6 +45,7 @@ const CategoryList = ({ newData, pageCount, pageNumber, changePage, setCategoryI
                                             key={item?._id}
                                             data={item}
                                             setCategoryID={setCategoryID}
+                                            permissionCheckResult={permissionCheckResult}
                                         />
                                     ))}
                                 </tbody>
