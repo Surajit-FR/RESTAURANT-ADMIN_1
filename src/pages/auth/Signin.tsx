@@ -1,36 +1,33 @@
 import { useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { NavigateFunction, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { clearAuthError, loginUser } from '../../services/slices/AuthSlice';
-import Cookies from 'js-cookie';
-import { DecryptData } from '../../helper/EncryptDecrypt';
 import { useFormik } from 'formik';
 import { loginValidationSchema } from '../../helper/FormValidation';
-import CustomAlert from '../../util/CustomAlert';
+// import CustomAlert from '../../util/CustomAlert';
 import Loader from '../../util/Loader';
+import { AppDispatch } from '../../store/Store';
+import { LoginRequest } from '../../store/reducers/AuthReducers';
+import { TLoginCredentials } from '../../types/authTypes';
 
-
-const userCookie = Cookies.get("user");
-const user = DecryptData(userCookie ? userCookie : "");
 
 const Signin = (): JSX.Element => {
-    const token: string | null = window.localStorage.getItem("token");
-    const _TOKEN = JSON.parse(token ?? 'null');
-    const { error, auth_loading } = useSelector((state: any) => state.authSlice);
-    const location = useLocation();
-    const dispatch: any = useDispatch();
-    const navigate: any = useNavigate();
+    const accessToken: string | null = window.localStorage.getItem("accessToken");
+    const refreshToken: string | null = window.localStorage.getItem("refreshToken");
 
-    const { values, errors, touched, handleBlur, handleChange, handleSubmit, isValid } = useFormik({
+    const { type } = useSelector((state: any) => state.authSlice);
+    const location = useLocation();
+    const dispatch: AppDispatch = useDispatch();
+    const navigate: NavigateFunction = useNavigate();
+
+    const { values, errors, touched, handleBlur, handleChange, handleSubmit, isValid } = useFormik<TLoginCredentials>({
         initialValues: {
-            credential: user?.credential ? user?.credential : "",
-            password: user?.password ? user?.password : "",
-            remember_me: user?.remember_me ? user?.remember_me : false
+            email: "",
+            password: "",
         },
         validationSchema: loginValidationSchema,
         onSubmit: (values) => {
-            dispatch(loginUser({ data: values, navigate }));
-        }
+            dispatch(LoginRequest({ data: values, navigate }));
+        },
     });
 
     useEffect(() => {
@@ -43,15 +40,12 @@ const Signin = (): JSX.Element => {
     }, [location]);
 
     useEffect(() => {
-        if (_TOKEN && navigate) {
+        if (accessToken && refreshToken && navigate) {
             navigate("/dashboard");
         } else if (navigate) {
             navigate("/admin/signin");
         }
-        return () => {
-            dispatch(clearAuthError());
-        };
-    }, [_TOKEN, navigate, dispatch]);
+    }, [accessToken, refreshToken, navigate, dispatch]);
 
     const renderError = (error: any) => {
         if (typeof error === "string") {
@@ -64,7 +58,7 @@ const Signin = (): JSX.Element => {
     return (
         <>
             {/* Loader */}
-            <Loader loading={auth_loading} />
+            <Loader loading={type === "authSlice/LoginRequest"} />
 
             <div className="wrapper">
                 <main className="authentication-content mt-5">
@@ -79,7 +73,7 @@ const Signin = (): JSX.Element => {
                                             <div className="row g-3">
 
                                                 {/* Error alert */}
-                                                {error && <CustomAlert type="danger" message={error?.message} onClose={() => dispatch(clearAuthError())} />}
+                                                {/* {error && <CustomAlert type="danger" message={error?.message} onClose={() => dispatch(clearAuthError())} />} */}
 
                                                 {/* Email Input */}
                                                 <div className="col-12">
@@ -93,14 +87,14 @@ const Signin = (): JSX.Element => {
                                                             className="form-control radius-30 ps-5"
                                                             id="inputEmailAddress"
                                                             placeholder="Email Address"
-                                                            name='credential'
-                                                            value={values?.credential || ""}
+                                                            name='email'
+                                                            value={values?.email || ""}
                                                             onChange={handleChange}
                                                             onBlur={handleBlur}
-                                                            style={{ border: touched?.credential && errors?.credential ? "1px solid red" : "" }}
+                                                            style={{ border: touched?.email && errors?.email ? "1px solid red" : "" }}
                                                         />
                                                     </div>
-                                                    {touched?.credential && renderError(errors?.credential)}
+                                                    {touched?.email && renderError(errors?.email)}
                                                 </div>
 
                                                 {/* Password Input */}
@@ -123,21 +117,6 @@ const Signin = (): JSX.Element => {
                                                         />
                                                     </div>
                                                     {touched?.password && renderError(errors?.password)}
-                                                </div>
-
-                                                {/* Remember me Input */}
-                                                <div className="col-6">
-                                                    <div className="form-check form-switch">
-                                                        <input
-                                                            className="form-check-input"
-                                                            type="checkbox"
-                                                            id="flexSwitchCheckChecked"
-                                                            name="remember_me"
-                                                            checked={values?.remember_me}
-                                                            onChange={handleChange}
-                                                        />
-                                                        <label className="form-check-label" htmlFor="flexSwitchCheckChecked">Remember Me</label>
-                                                    </div>
                                                 </div>
 
                                                 {/* <div className="col-6 text-end">

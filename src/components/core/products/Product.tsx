@@ -1,20 +1,19 @@
 import { Link } from "react-router-dom";
-import { CustomHeadersType, ProductResponse, UserData } from "../../../config/DataTypes.config";
-import { REACT_APP_BASE_URL } from "../../../config/App.config";
-import { getProductDetails } from "../../../services/slices/UtilitySlice";
 import { useDispatch } from "react-redux";
-import { Dispatch } from "redux";
 import { checkPermissions, permissionsToCheck } from "../../../helper/CheckPermissions";
+import { User } from "../../../types/authTypes";
+import { ProductData } from "../../../types/productTypes";
+import { AppDispatch } from "../../../store/Store";
+import { getProductRequest } from "../../../store/reducers/ProductReducers";
 
 type DataList_Props = {
-    data: ProductResponse,
+    data: ProductData,
     setProductID: (id: string) => void,
-    userData: UserData,
-    header: CustomHeadersType | undefined
+    userData: User
 }
 
-const Product = ({ data, setProductID, userData, header }: DataList_Props): JSX.Element => {
-    const dispatch: Dispatch<any> = useDispatch();
+const Product = ({ data, setProductID, userData }: DataList_Props): JSX.Element => {
+    const dispatch: AppDispatch = useDispatch();
 
     const imageContainer: React.CSSProperties = {
         height: "200px",
@@ -34,13 +33,14 @@ const Product = ({ data, setProductID, userData, header }: DataList_Props): JSX.
 
     const permissionCheckResult = checkPermissions(userData, permissionsToCheck);
 
+
     return (
         <div className="col">
             <div className="card border shadow-none mb-0">
                 <div className="card-body text-center">
                     <div className=" mb-3" style={imageContainer}>
                         <img
-                            src={`${REACT_APP_BASE_URL}/${data?.productImage}`}
+                            src={data?.coverImage}
                             className="img-fluid"
                             alt="Product"
                             style={imageContainerImg}
@@ -51,18 +51,18 @@ const Product = ({ data, setProductID, userData, header }: DataList_Props): JSX.
 
                     <div className="actions d-flex align-items-center justify-content-center gap-2 mt-3">
                         {
-                            (permissionCheckResult?.edit_update || permissionCheckResult?.all) &&
+                            (permissionCheckResult?.Edit || permissionCheckResult?.All) &&
                             <Link
                                 to="#"
                                 className="btn btn-sm btn-outline-primary"
                                 data-bs-toggle="modal"
                                 data-bs-target="#updateProductModal"
-                                onClick={() => dispatch(getProductDetails({ product_id: data?._id, header }))}
+                                onClick={() => dispatch(getProductRequest({ productId: data?._id }))}
                             ><i className="bi bi-pencil-fill"></i>Edit
                             </Link>
                         }
                         {
-                            (permissionCheckResult?.delete || permissionCheckResult?.all) &&
+                            (permissionCheckResult?.Delete || permissionCheckResult?.All) &&
                             <Link
                                 to="#"
                                 className="btn btn-sm btn-outline-danger"
@@ -74,13 +74,13 @@ const Product = ({ data, setProductID, userData, header }: DataList_Props): JSX.
                         }
 
                         {
-                            (permissionCheckResult?.read || permissionCheckResult?.all) &&
+                            (permissionCheckResult?.Read || permissionCheckResult?.All) &&
                             <Link
                                 to="#"
                                 className="btn btn-sm btn-outline-info"
                                 data-bs-toggle="modal"
                                 data-bs-target="#productDetails"
-                                onClick={() => dispatch(getProductDetails({ product_id: data?._id, header }))}
+                                onClick={() => dispatch(getProductRequest({ productId: data?._id }))}
                             ><i className="bi bi-file-text"></i>Detail
                             </Link>
                         }

@@ -1,8 +1,9 @@
-import { PermissionCheckResult, UserData } from "../config/DataTypes.config";
+import { PermissionCheckResult } from "../config/DataTypes.config";
+import { User } from "../types/authTypes";
 
-export const permissionsToCheck = ["all", "read", "write_create", "edit_update", "delete"];
+export const permissionsToCheck = ["All", "Read", "Write", "Delete"];
 
-export const checkPermissions = (userData: UserData | null | undefined, permissionNames: string[]): PermissionCheckResult => {
+export const checkPermissions = (userData: User | undefined, permissionNames: string[]): PermissionCheckResult => {
     const permissionNamesSet = new Set(permissionNames);
     const permissions = userData?.role?.permissions || [];
     const result: PermissionCheckResult = {};
@@ -11,7 +12,7 @@ export const checkPermissions = (userData: UserData | null | undefined, permissi
         if (permissionNamesSet.has(permission.name)) {
             result[permission.name] = true;
         }
-    }
+    };
 
     for (const permissionName of permissionNames) {
         if (!(permissionName in result)) {

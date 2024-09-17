@@ -1,10 +1,9 @@
 import { useFormik } from "formik";
 import { categoryValidationSchema } from "../../../helper/FormValidation";
-import CustomAlert from "../../../util/CustomAlert";
-import { useDispatch, useSelector } from "react-redux";
-import { addCategory, clearCategoryRespData, clearError } from "../../../services/slices/UtilitySlice";
-import { useEffect } from "react";
+import { useDispatch } from "react-redux";
 import { REACT_APP_PRODUCT_PER_PAGE } from "../../../config/App.config";
+import { AppDispatch } from "../../../store/Store";
+import { addCategoryRequest } from "../../../store/reducers/CategoryReducers";
 
 type addCategory_props = {
     pageCount: number;
@@ -13,18 +12,7 @@ type addCategory_props = {
 }
 
 const AddCategory = ({ pageNumber }: addCategory_props): JSX.Element => {
-    const { category_resp_data, error } = useSelector((state: any) => state.utilitySlice);
-    const dispatch: any = useDispatch();
-
-    const token: string | null = window.localStorage.getItem("token");
-    const _TOKEN = JSON.parse(token ?? 'null');
-
-    // header
-    const header = {
-        headers: {
-            Authorization: `Bearer ${_TOKEN}`
-        }
-    };
+    const dispatch: AppDispatch = useDispatch();
 
     // dataPerPage
     const dataPerPage = REACT_APP_PRODUCT_PER_PAGE;
@@ -32,12 +20,20 @@ const AddCategory = ({ pageNumber }: addCategory_props): JSX.Element => {
     // taking form values
     const { values, errors, touched, handleBlur, handleChange, handleSubmit, isValid, resetForm } = useFormik({
         initialValues: {
-            category_name: "",
-            category_desc: "",
+            categoryName: "",
+            categoryDesc: "",
         },
         validationSchema: categoryValidationSchema,
         onSubmit: (values) => {
-            dispatch(addCategory({ data: values, page: (pageNumber + 1), pageSize: dataPerPage, header }));
+            dispatch(addCategoryRequest({
+                data: values,
+                page: (pageNumber + 1),
+                limit: dataPerPage,
+                query: '',
+                sortBy: 'createdAt',
+                sortType: 'desc',
+                resetForm
+            }));
         }
     });
 
@@ -49,21 +45,11 @@ const AddCategory = ({ pageNumber }: addCategory_props): JSX.Element => {
         return null;
     };
 
-    useEffect(() => {
-        if (category_resp_data?.success) {
-            resetForm();
-        }
-    }, [category_resp_data, resetForm]);
-
     return (
         <>
             <div className="col-12 col-lg-4 d-flex">
                 <div className="card border shadow-none w-100">
                     <div className="card-body">
-
-                        {/* Alert */}
-                        {error?.success === false ? <CustomAlert type="danger" message={error?.message} onClose={() => dispatch(clearError())} /> : null}
-                        {category_resp_data?.success === true ? <CustomAlert type="success" message={category_resp_data?.message} onClose={() => dispatch(clearCategoryRespData())} /> : null}
 
                         <form className="row g-3" onSubmit={handleSubmit}>
                             {/* Category Name */}
@@ -74,14 +60,14 @@ const AddCategory = ({ pageNumber }: addCategory_props): JSX.Element => {
                                     type="text"
                                     className="form-control"
                                     placeholder="Category name"
-                                    name="category_name"
-                                    value={values?.category_name || ""}
+                                    name="categoryName"
+                                    value={values?.categoryName || ""}
                                     onChange={handleChange}
                                     onBlur={handleBlur}
-                                    style={{ border: touched?.category_name && errors?.category_name ? "1px solid red" : "" }}
+                                    style={{ border: touched?.categoryName && errors?.categoryName ? "1px solid red" : "" }}
                                 />
                             </div>
-                            {touched?.category_name && renderError(errors?.category_name)}
+                            {touched?.categoryName && renderError(errors?.categoryName)}
 
                             {/* Category Description */}
                             <div className="col-12">
@@ -91,9 +77,9 @@ const AddCategory = ({ pageNumber }: addCategory_props): JSX.Element => {
                                     className="form-control"
                                     rows={3}
                                     cols={3}
-                                    name="category_desc"
+                                    name="categoryDesc"
                                     placeholder="Category Description"
-                                    value={values?.category_desc || ""}
+                                    value={values?.categoryDesc || ""}
                                     onChange={handleChange}
                                 ></textarea>
                             </div>

@@ -1,8 +1,8 @@
 import { Link, useNavigate } from "react-router-dom";
-import { logoutUser } from "../../../services/slices/AuthSlice";
 import { useDispatch } from "react-redux";
 import { DecryptData } from "../../../helper/EncryptDecrypt";
 import { dropdownItemsType } from "../../../config/DataTypes.config";
+import { LogoutRequest } from "../../../store/reducers/AuthReducers";
 
 const UserDropdown = (): JSX.Element => {
     const user: string | null = window.localStorage.getItem("user");
@@ -13,7 +13,7 @@ const UserDropdown = (): JSX.Element => {
 
     // Logout function
     const userLogout = () => {
-        dispatch(logoutUser(navigate));
+        dispatch(LogoutRequest({ navigate }));
     }
 
     // Define an array of dropdown items

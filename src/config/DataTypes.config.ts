@@ -138,13 +138,6 @@ export type dropdownItemsType = {
     link: string;
 };
 
-// Define the pagination type
-export type Pagination_Type = {
-    pageCount: number;
-    pageNumber: number;
-    changePage: (data: { selected: number }) => void;
-};
-
 // Category list type
 export type CategoryListType = {
     _id: string;

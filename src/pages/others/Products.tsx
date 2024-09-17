@@ -1,38 +1,29 @@
 import { Link } from "react-router-dom";
 import Pagination from "../../util/Pagination";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Product from "../../components/core/products/Product";
 import { useDispatch, useSelector } from "react-redux";
-import { Dispatch } from "redux";
-import { clearDelError, clearProductDelResp, deleteProduct, getAllCategory, getAllProduct } from "../../services/slices/UtilitySlice";
-import { CategoryListType, ProductResponse } from "../../config/DataTypes.config";
 import { REACT_APP_PRODUCT_PER_PAGE } from "../../config/App.config";
 import Search from "../../components/common/Search";
 import ConfModal from "../../util/ConfModal";
-import CustomAlert from "../../util/CustomAlert";
 import ProductDetailsModal from "../../util/ProductDetailsModal";
 import UpdateProductModal from "../../util/UpdateProductModal";
-import { DecryptData } from "../../helper/EncryptDecrypt";
 import { checkPermissions, permissionsToCheck } from "../../helper/CheckPermissions";
+import { AppDispatch, RootState } from "../../store/Store";
+import { ProductData } from "../../types/productTypes";
+import { CategoryData } from "../../types/categoryTypes";
+import { getAllProductRequest } from "../../store/reducers/ProductReducers";
+import { getAllCategoryRequest } from "../../store/reducers/CategoryReducers";
 
 const Products = (): JSX.Element => {
-    const { products_data, category_data, del_error, product_del_resp } = useSelector((state: any) => state.utilitySlice);
-    const dispatch: Dispatch<any> = useDispatch();
-
-    const token: string | null = window.localStorage.getItem("token");
-    const _TOKEN = JSON.parse(token ?? 'null');
-    const user: string | null = window.localStorage.getItem("user");
-    const userData = DecryptData(user ?? 'null');
-
-    const header = useMemo(() => ({
-        headers: {
-            Authorization: `Bearer ${_TOKEN}`
-        }
-    }), [_TOKEN]);
+    const { categoryData } = useSelector((state: RootState) => state.categorySlice);
+    const { productData } = useSelector((state: RootState) => state.productSlice);
+    const { userData } = useSelector((state: any) => state.userSlice);
+    const dispatch: AppDispatch = useDispatch();
 
     const [pageNumber, setPageNumber] = useState<number>(0);
-    const [productData, setProductData] = useState<ProductResponse[]>([]);
-    const [categoryData, setCategoryData] = useState<CategoryListType[]>([]);
+    const [productStateData, setProductStateData] = useState<Array<ProductData>>();
+    const [categoryStateData, setCategoryStateData] = useState<Array<CategoryData>>();
     const [productID, setProductID] = useState<string>("");
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
@@ -40,22 +31,22 @@ const Products = (): JSX.Element => {
 
     // Pagination
     const dataPerPage = REACT_APP_PRODUCT_PER_PAGE;
-    const pageCount = products_data?.totalPages;
+    const pageCount = productData?.pagination?.totalPages;
 
     const changePage = ({ selected }: { selected: number }) => {
         setPageNumber(selected);
     };
 
     const handleDelete = () => {
-        if (categoryData) {
-            dispatch(deleteProduct({
-                product_id: productID,
-                page: (pageNumber + 1),
-                pageSize: dataPerPage,
-                search: debouncedSearchQuery,
-                category: selectedCategory,
-                header
-            }));
+        if (categoryStateData) {
+            // dispatch(deleteProduct({
+            //     product_id: productID,
+            //     page: (pageNumber + 1),
+            //     pageSize: dataPerPage,
+            //     search: debouncedSearchQuery,
+            //     category: selectedCategory,
+            //     header
+            // }));
         };
     };
 
@@ -68,7 +59,7 @@ const Products = (): JSX.Element => {
     };
 
     // permissionCheck
-    const permissionCheckResult = checkPermissions(userData, permissionsToCheck);
+    const permissionCheckResult = checkPermissions(userData?.user, permissionsToCheck);
 
     // Debounce logic for search input
     useEffect(() => {
@@ -82,20 +73,26 @@ const Products = (): JSX.Element => {
     }, [searchQuery]);
 
     useEffect(() => {
-        dispatch(getAllProduct({
+        dispatch(getAllProductRequest({
             page: (pageNumber + 1),
-            pageSize: dataPerPage,
-            search: debouncedSearchQuery,
-            category: selectedCategory,
-            header
+            limit: dataPerPage,
+            query: debouncedSearchQuery,
+            sortBy: 'createdAt',
+            sortType: 'desc',
         }));
-        dispatch(getAllCategory({ page: (pageNumber + 1), pageSize: dataPerPage, header }));
-    }, [dispatch, dataPerPage, header, pageNumber, debouncedSearchQuery, selectedCategory]);
+        dispatch(getAllCategoryRequest({
+            page: (pageNumber + 1),
+            limit: dataPerPage,
+            query: "",
+            sortBy: 'createdAt',
+            sortType: 'desc',
+        }));
+    }, [dispatch, dataPerPage, pageNumber, debouncedSearchQuery, selectedCategory]);
 
     useEffect(() => {
-        setProductData(products_data?.data);
-        setCategoryData(category_data?.data);
-    }, [products_data, category_data]);
+        setProductStateData(productData?.products);
+        setCategoryStateData(categoryData?.categories);
+    }, [productData?.products, categoryData?.categories]);
 
 
     return (
@@ -107,7 +104,6 @@ const Products = (): JSX.Element => {
                 dataPerPage={dataPerPage}
                 debouncedSearchQuery={debouncedSearchQuery}
                 selectedCategory={selectedCategory}
-                header={header}
             />
 
             {/* Delete Modal */}
@@ -121,7 +117,6 @@ const Products = (): JSX.Element => {
             <ProductDetailsModal
                 modalId="productDetails"
                 productID={productID}
-                header={header}
             />
 
             {/* <!--content--> */}
@@ -146,7 +141,7 @@ const Products = (): JSX.Element => {
                         <div className="row align-items-center">
                             <div className="col-lg-3 col-xl-2">
                                 {
-                                    (permissionCheckResult?.write_create || permissionCheckResult?.all) &&
+                                    (permissionCheckResult?.Write || permissionCheckResult?.All) &&
                                     <Link to="/add/product" className="btn btn-primary mb-3 mb-lg-0">
                                         <i className="lni lni-plus me-2">
                                         </i>Add Product
@@ -174,9 +169,9 @@ const Products = (): JSX.Element => {
                             <div className="col-lg-2 col-6 col-md-3">
                                 <select className="form-select" value={selectedCategory} onChange={handleCategoryChange}>
                                     <option value="">All categories</option>
-                                    {categoryData && categoryData?.map((item) => {
+                                    {categoryStateData && categoryStateData?.map((item) => {
                                         return (
-                                            <option key={item?.categoryID} value={item?._id}>{item?.category_name}</option>
+                                            <option key={item?.categoryID} value={item?._id}>{item?.categoryName}</option>
                                         )
                                     })}
                                 </select>
@@ -188,19 +183,6 @@ const Products = (): JSX.Element => {
                     {/* Alert */}
                     <div className="row d-flex justify-content-center mt-2">
                         <div className="col-4">
-                            {
-                                del_error?.success === false ?
-                                    <CustomAlert
-                                        type="danger"
-                                        message={del_error?.message}
-                                        onClose={() => dispatch(clearDelError())}
-                                    /> : product_del_resp?.success === true ?
-                                        <CustomAlert
-                                            type="success"
-                                            message={product_del_resp?.message}
-                                            onClose={() => dispatch(clearProductDelResp())}
-                                        /> : null
-                            }
                         </div>
                     </div>
 
@@ -210,14 +192,13 @@ const Products = (): JSX.Element => {
                             <div className="row row-cols-1 row-cols-lg-4 row-cols-xl-4 row-cols-xxl-5 g-3">
 
                                 {/* Product */}
-                                {productData && productData?.map((item) => {
+                                {productStateData && productStateData?.map((item) => {
                                     return (
                                         <Product
                                             key={item?._id}
                                             data={item}
                                             setProductID={id => setProductID(id)}
-                                            header={header}
-                                            userData={userData}
+                                            userData={userData?.user}
                                         />
                                     )
                                 })}
@@ -228,7 +209,7 @@ const Products = (): JSX.Element => {
                         <nav className="float-end mt-4" aria-label="Page navigation">
                             {/* Pagination */}
                             <Pagination
-                                pageCount={pageCount}
+                                pageCount={pageCount as number}
                                 pageNumber={pageNumber}
                                 changePage={changePage}
                             />

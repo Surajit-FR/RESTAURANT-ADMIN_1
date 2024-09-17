@@ -5,15 +5,20 @@ import BackOnTop from './components/common/BackOnTop';
 import AllRoutes from './routes/AllRoutes';
 import Loader from './util/Loader';
 import { useSelector } from 'react-redux';
+import { RootState } from './store/Store';
+import { isCategoryLoading, isProductLoading } from './util/loading';
 
 const App = (): JSX.Element => {
-  const { utility_loading } = useSelector((state: any) => state.utilitySlice);
+  const category = useSelector((state: RootState) => state.categorySlice);
+  const product = useSelector((state: RootState) => state.productSlice);
+
+  const LOADING = isCategoryLoading(category) || isProductLoading(product);
 
   return (
     <>
       {/* Loader */}
       <Loader
-        loading={utility_loading}
+        loading={LOADING}
       />
 
       <div className="wrapper">

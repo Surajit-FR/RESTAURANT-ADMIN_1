@@ -3,62 +3,63 @@ import AddCategory from "../../components/core/categories/AddCategory";
 import CategoryList from "../../components/core/categories/CategoryList";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useMemo, useState } from "react";
-import { CategoryListType } from "../../config/DataTypes.config";
-import { deleteCategory, getAllCategory } from "../../services/slices/UtilitySlice";
 import ConfModal from "../../util/ConfModal";
 import { REACT_APP_CATEGORY_PER_PAGE } from "../../config/App.config";
 import UpdateCategoryModal from "../../util/UpdateCategoryModal";
-import { DecryptData } from "../../helper/EncryptDecrypt";
 import { checkPermissions, permissionsToCheck } from "../../helper/CheckPermissions";
+import { deleteCategoryRequest, getAllCategoryRequest } from "../../store/reducers/CategoryReducers";
+import { AppDispatch, RootState } from "../../store/Store";
+import { CategoryData } from "../../types/categoryTypes";
 
 const Categories = (): JSX.Element => {
-    const { category_data } = useSelector((state: any) => state.utilitySlice);
-    const dispatch: any = useDispatch();
-
-    const token: string | null = window.localStorage.getItem("token");
-    const _TOKEN = JSON.parse(token ?? 'null');
-    const user: string | null = window.localStorage.getItem("user");
-    const userData = DecryptData(user ?? 'null');
-
-    const header = useMemo(() => ({
-        headers: {
-            Authorization: `Bearer ${_TOKEN}`
-        }
-    }), [_TOKEN]);
+    const { categoryData } = useSelector((state: RootState) => state.categorySlice);
+    const { userData } = useSelector((state: RootState) => state.userSlice);
+    const dispatch: AppDispatch = useDispatch();
 
     const [pageNumber, setPageNumber] = useState<number>(0);
     const [categoryID, setCategoryID] = useState<string>('');
-    const [categoryData, setCategoryData] = useState<CategoryListType[]>([]);
+    const [categoryStateData, setCategoryStateData] = useState<Array<CategoryData>>();
 
     const dataPerPage = REACT_APP_CATEGORY_PER_PAGE;
-    const pageCount = category_data?.totalPages;
+    const pageCount = categoryData?.pagination?.totalPages as number;
 
     const changePage = ({ selected }: { selected: number }) => {
         setPageNumber(selected);
     };
 
     const handleDelete = () => {
-        if (categoryData) {
-            dispatch(deleteCategory({ category_id: categoryID, page: (pageNumber + 1), pageSize: dataPerPage, header }));
+        if (categoryStateData) {
+            dispatch(deleteCategoryRequest({
+                categoryId: categoryID,
+                page: (pageNumber + 1),
+                limit: dataPerPage,
+                query: '',
+                sortBy: 'createdAt',
+                sortType: 'desc',
+            }));
         }
     };
 
     const selectedCategory = useMemo(() => {
-        return categoryData?.find(category => category?._id === categoryID);
-    }, [categoryID, categoryData]);
+        return categoryStateData?.find(category => category?._id === categoryID);
+    }, [categoryID, categoryStateData]);
 
     // permissionCheck
-    const permissionCheckResult = checkPermissions(userData, permissionsToCheck);
+    const permissionCheckResult = checkPermissions(userData?.user, permissionsToCheck);
 
     useEffect(() => {
-        dispatch(getAllCategory({ page: (pageNumber + 1), pageSize: dataPerPage, header }));
-    }, [dispatch, header, pageNumber, dataPerPage]);
+        dispatch(getAllCategoryRequest({
+            page: (pageNumber + 1),
+            limit: dataPerPage,
+            query: "",
+            sortBy: "",
+            sortType: "",
+        }));
+    }, [dispatch, pageNumber, dataPerPage]);
 
     useEffect(() => {
-        setCategoryData(category_data?.data);
-    }, [category_data]);
-
-    console.log(userData);
+        setCategoryStateData(categoryData?.categories);
+    }, [categoryData]);
 
 
     return (
@@ -68,7 +69,6 @@ const Categories = (): JSX.Element => {
                 pageNumber={pageNumber}
                 modalId="updateCategoryModal"
                 dataPerPage={dataPerPage}
-                header={header}
                 categoryData={selectedCategory}
             />
 
@@ -100,7 +100,7 @@ const Categories = (): JSX.Element => {
                     <div className="card-body">
                         <div className="row">
                             {
-                                (permissionCheckResult?.write_create || permissionCheckResult?.all) &&
+                                (permissionCheckResult?.Write || permissionCheckResult?.All) &&
                                 <AddCategory
                                     pageCount={pageCount}
                                     pageNumber={pageNumber}
@@ -109,7 +109,7 @@ const Categories = (): JSX.Element => {
                             }
 
                             <CategoryList
-                                newData={categoryData}
+                                newData={categoryStateData}
                                 pageCount={pageCount}
                                 pageNumber={pageNumber}
                                 changePage={changePage}

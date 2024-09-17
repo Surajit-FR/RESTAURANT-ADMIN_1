@@ -1,18 +1,13 @@
-import { useDispatch, useSelector } from "react-redux";
-import { CustomHeadersType } from "../config/DataTypes.config";
-import { REACT_APP_BASE_URL } from "../config/App.config";
-import { clearProductsDetailsData } from "../services/slices/UtilitySlice";
-import { Dispatch } from "redux";
+import { useSelector } from "react-redux";
+import { RootState } from "../store/Store";
 
 interface ProductDetailsModalProps {
     modalId: string;
     productID: string;
-    header: CustomHeadersType | undefined
 }
 
-const ProductDetailsModal = ({ modalId, productID, header }: ProductDetailsModalProps): JSX.Element => {
-    const { products_details_data } = useSelector((state: any) => state.utilitySlice);
-    const dispatch: Dispatch<any> = useDispatch();
+const ProductDetailsModal = ({ modalId }: ProductDetailsModalProps): JSX.Element => {
+    const { singleProductData } = useSelector((state: RootState) => state.productSlice);
 
     const imageContainer: React.CSSProperties = {
         height: "400px",
@@ -39,15 +34,15 @@ const ProductDetailsModal = ({ modalId, productID, header }: ProductDetailsModal
                         <div className="modal-header">
                             {/* Heading */}
                             <h4 className="modal-title">
-                                {products_details_data?.data?.productTitle}
+                                {singleProductData?.productTitle}
                             </h4>
-                            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={() => dispatch(clearProductsDetailsData())}></button>
+                            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div className="modal-body">
                             {/* Image */}
                             <div style={imageContainer} className="shadow mb-5 bg-white rounded">
                                 <img
-                                    src={`${REACT_APP_BASE_URL}/${products_details_data?.data?.productImage}`}
+                                    src={singleProductData?.coverImage}
                                     alt="Product"
                                     style={imageContainerImg}
                                 />
@@ -57,21 +52,21 @@ const ProductDetailsModal = ({ modalId, productID, header }: ProductDetailsModal
                                 {/* Product Offer */}
                                 <div className="col-md-6">
                                     <h5 style={{ fontSize: "16px" }}>Product Offer:
-                                        <span className="mx-2" style={{ fontWeight: "normal", fontSize: "14px" }}>{products_details_data?.data?.offer === "true" ? "Yes" : "No"}</span>
+                                        <span className="mx-2" style={{ fontWeight: "normal", fontSize: "14px" }}>{singleProductData?.offer === "true" ? "Yes" : "No"}</span>
                                     </h5>
                                 </div>
 
                                 {/* Offer Percentage */}
                                 <div className="col-md-6">
                                     <h5 style={{ fontSize: "16px" }}>Offer Percentage:
-                                        <span className="mx-2" style={{ fontWeight: "normal", fontSize: "14px" }}>{products_details_data?.data?.offerPercentage ? (Number(products_details_data?.data?.offerPercentage)).toFixed(2) : "N/A"}</span>
+                                        <span className="mx-2" style={{ fontWeight: "normal", fontSize: "14px" }}>{singleProductData?.offerPercentage ? (Number(singleProductData?.offerPercentage)).toFixed(2) : "N/A"}</span>
                                     </h5>
                                 </div>
 
                                 {/* Product Price */}
                                 <div className="col-md-6">
                                     <h5 style={{ fontSize: "16px" }}>Product Price:
-                                        <span className="mx-2" style={{ fontWeight: "normal", fontSize: "14px" }}>{products_details_data?.data?.price ? `₹${Number(products_details_data?.data?.price).toFixed(2)}` : "N/A"}</span>
+                                        <span className="mx-2" style={{ fontWeight: "normal", fontSize: "14px" }}>{singleProductData?.price ? `₹${Number(singleProductData?.price).toFixed(2)}` : "N/A"}</span>
                                     </h5>
                                 </div>
 
@@ -79,7 +74,7 @@ const ProductDetailsModal = ({ modalId, productID, header }: ProductDetailsModal
                                 <div className="col-md-6">
                                     <h5 style={{ fontSize: "16px" }}>Availability
                                         <span className="mx-2">
-                                            {products_details_data?.data?.availability ? <i className="bi bi-check2-square text-success"></i> : <i className="bi bi-x-square text-danger"></i>}
+                                            {singleProductData?.availability ? <i className="bi bi-check2-square text-success"></i> : <i className="bi bi-x-square text-danger"></i>}
                                         </span>
                                     </h5>
                                 </div>
@@ -87,14 +82,14 @@ const ProductDetailsModal = ({ modalId, productID, header }: ProductDetailsModal
                                 {/* Product Visibility */}
                                 <div className="col-md-6">
                                     <h5 style={{ fontSize: "16px" }}>Visibility
-                                        <span className="mx-2">{products_details_data?.data?.visibility ? <i className="bi bi-check2-square text-success"></i> : <i className="bi bi-x-square text-danger"></i>}</span>
+                                        <span className="mx-2">{singleProductData?.visibility ? <i className="bi bi-check2-square text-success"></i> : <i className="bi bi-x-square text-danger"></i>}</span>
                                     </h5>
                                 </div>
 
                                 {/* Product Category */}
                                 <div className="col-md-6">
                                     <h5 style={{ fontSize: "16px" }}>Product Category:
-                                        <span className="mx-2" style={{ fontWeight: "normal", fontSize: "14px" }}>{products_details_data?.data?.category ? products_details_data?.data?.category?.category_name : "N/A"}</span>
+                                        <span className="mx-2" style={{ fontWeight: "normal", fontSize: "14px" }}>{singleProductData?.category ? singleProductData?.category?.categoryName : "N/A"}</span>
                                     </h5>
                                 </div>
 
@@ -103,16 +98,16 @@ const ProductDetailsModal = ({ modalId, productID, header }: ProductDetailsModal
                                 <div className="col-md-12">
                                     <h5 style={{ fontSize: "16px" }}>Product Description:
                                         <span className="mx-2" style={{ fontWeight: "normal", fontSize: "14px" }}>
-                                            {products_details_data?.data?.productDescription ? products_details_data?.data?.productDescription : "N/A"}
+                                            {singleProductData?.productDescription ? singleProductData?.productDescription : "N/A"}
                                         </span>
                                     </h5>
                                 </div>
                             </div>
                         </div>
 
-                        {/* <div className="modal-footer">
-                            <button type="button" className="btn btn-dark" data-bs-dismiss="modal" onClick={() => dispatch(clearProductsDetailsData())}>OK</button>
-                        </div> */}
+                        <div className="modal-footer">
+                            <button type="button" className="btn btn-dark" data-bs-dismiss="modal">OK</button>
+                        </div>
                     </div>
                 </div>
             </div>

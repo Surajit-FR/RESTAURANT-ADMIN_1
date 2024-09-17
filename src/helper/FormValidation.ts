@@ -2,13 +2,13 @@ import * as Yup from 'yup';
 
 // login validation
 export const loginValidationSchema = Yup.object({
-    credential: Yup.string().email('Invalid email address').required('Email ID is required'),
-    password: Yup.string().required('Password is required')
+    email: Yup.string().email('Invalid email address').required('Email ID is required'),
+    password: Yup.string().required('Password is required'),
 });
 
 // category validation
 export const categoryValidationSchema = Yup.object({
-    category_name: Yup.string()
+    categoryName: Yup.string()
         .matches(/^[A-Za-z\s]+$/, 'Category name can only contain alphabets and spaces')
         .required('Category name is required'),
 });
@@ -23,7 +23,7 @@ export const addProductValidationSchema = Yup.object({
             then: (schema) => schema.required('Offer percentage is required').min(0, 'Minimum value is 0').max(100, 'Maximum value is 100'),
             otherwise: (schema) => schema.nullable()
         }),
-    productImage: Yup.mixed().required("Product image is required"),
+    coverImage: Yup.mixed().required("Product image is required"),
     productDescription: Yup.string(),
     price: Yup.number().required("Price is required").positive("Price must be a positive number"),
     availability: Yup.string().required("Availability selection is required"),

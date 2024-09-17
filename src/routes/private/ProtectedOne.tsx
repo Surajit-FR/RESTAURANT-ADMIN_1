@@ -1,14 +1,14 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 
 const ProtectedOne = (): JSX.Element => {
-    const token: string | null = window.localStorage.getItem("token");
-    const _TOKEN = JSON.parse(token ?? 'null');
+    const accessToken: string | null = window.localStorage.getItem("accessToken");
+    const refreshToken: string | null = window.localStorage.getItem("refreshToken");
     const location = useLocation();
 
     return (
         <>
             {
-                _TOKEN ? <Outlet /> : <Navigate to="/admin/signin" state={{ from: location }} replace />
+                (accessToken && refreshToken) ? <Outlet /> : <Navigate to="/admin/signin" state={{ from: location }} replace />
             }
         </>
     );

@@ -1,37 +1,27 @@
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
-import { CategoryListType } from "../../../config/DataTypes.config";
-import { useEffect, useMemo, useState } from "react";
-import { addProduct, clearAddProductRespData, clearError, getAllCategory } from "../../../services/slices/UtilitySlice";
+import { Link, NavigateFunction, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import { addProductValidationSchema } from "../../../helper/FormValidation";
-import CustomAlert from "../../../util/CustomAlert";
+import { AppDispatch, RootState } from "../../../store/Store";
+import { getAllCategoryRequest } from "../../../store/reducers/CategoryReducers";
+import { CategoryData } from "../../../types/categoryTypes";
 
 const AddProduct = () => {
-    const token: string | null = window.localStorage.getItem("token");
-    const _TOKEN = JSON.parse(token ?? 'null');
+    const { categoryData } = useSelector((state: RootState) => state.categorySlice);
+    const dispatch: AppDispatch = useDispatch();
+    const navigate: NavigateFunction = useNavigate();
 
-    const header = useMemo(() => ({
-        headers: {
-            Authorization: `Bearer ${_TOKEN}`
-        }
-    }), [_TOKEN]);
-
-    const { category_data, add_product_resp_data, error } = useSelector((state: any) => state.utilitySlice);
-    const navigate: any = useNavigate();
-    const dispatch: any = useDispatch();
-
-    const [categoryData, setCategoryData] = useState<CategoryListType[]>([]);
-    // State variable to hold the URL of the selected image
-    const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const [categoryStateData, setCategoryStateData] = useState<Array<CategoryData>>();
+    const [imagePreview, setImagePreview] = useState<string>();
 
     // taking form values
-    const { values, errors, touched, handleBlur, handleChange, handleSubmit, isValid, resetForm, setFieldValue } = useFormik({
+    const { values, errors, touched, handleBlur, handleChange, handleSubmit, isValid, setFieldValue } = useFormik({
         initialValues: {
             productTitle: "",
-            offer: false, // Changed to boolean
+            offer: "false",
             offerPercentage: "",
-            productImage: null,
+            coverImage: "",
             productDescription: "",
             price: "",
             availability: "Available",
@@ -48,9 +38,9 @@ const AddProduct = () => {
             formData.append("offer", values.offer.toString());
             formData.append("offerPercentage", values.offerPercentage);
 
-            // Check if productImage is not null before appending
-            if (values.productImage !== null) {
-                formData.append("productImage", values.productImage);
+            // Check if coverImage is not null before appending
+            if (values.coverImage !== null) {
+                formData.append("coverImage", values.coverImage);
             }
 
             formData.append("productDescription", values.productDescription);
@@ -60,25 +50,31 @@ const AddProduct = () => {
             formData.append("category", values.category);
 
             // Dispatch addProduct action with formData and header
-            dispatch(addProduct({ data: formData, header }));
+            // dispatch(addProduct({ data: formData, header }));
         }
     });
 
 
     useEffect(() => {
-        dispatch(getAllCategory({ header }));
-    }, [dispatch, header]);
+        dispatch(getAllCategoryRequest({
+            page: "",
+            limit: "",
+            query: "",
+            sortBy: 'createdAt',
+            sortType: 'desc',
+        }));
+    }, [dispatch]);
 
     useEffect(() => {
-        setCategoryData(category_data?.data);
-    }, [category_data]);
+        setCategoryStateData(categoryData?.categories);
+    }, [categoryData]);
 
-    useEffect(() => {
-        if (add_product_resp_data?.success) {
-            resetForm();
-            setImagePreview(null);
-        }
-    }, [add_product_resp_data, resetForm]);
+    // useEffect(() => {
+    //     if (add_product_resp_data?.success) {
+    //         resetForm();
+    //         setImagePreview(null);
+    //     }
+    // }, [add_product_resp_data, resetForm]);
 
     // Function to handle file input change and display image preview
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -87,7 +83,7 @@ const AddProduct = () => {
             // Set the image preview URL
             setImagePreview(URL.createObjectURL(file));
             // Set the selected image file to formik field
-            setFieldValue("productImage", file);
+            setFieldValue("coverImage", file);
         }
     };
 
@@ -124,26 +120,6 @@ const AddProduct = () => {
                                 </div>
                             </div>
                             <div className="card-body">
-
-                                {/* Alert */}
-                                <div className="row d-flex justify-content-center">
-                                    <div className="col-6">
-                                        {
-                                            error?.success === false ?
-                                                <CustomAlert
-                                                    type="danger"
-                                                    message={error?.message}
-                                                    onClose={() => dispatch(clearError())}
-                                                /> : add_product_resp_data?.success === true ?
-                                                    <CustomAlert
-                                                        type="success"
-                                                        message={add_product_resp_data?.message}
-                                                        onClose={() => dispatch(clearAddProductRespData())}
-                                                    /> : null
-                                        }
-                                    </div>
-                                </div>
-
                                 <form className="row g-3" onSubmit={handleSubmit}>
                                     <div className="col-12 col-lg-8">
                                         <div className="card shadow-none bg-light border">
@@ -173,7 +149,7 @@ const AddProduct = () => {
                                                         id="offer"
                                                         className="form-select"
                                                         name="offer"
-                                                        value={values.offer.toString()} // Convert boolean to string
+                                                        value={values.offer.toString()}
                                                         onChange={handleChange}
                                                         onBlur={handleBlur}
                                                     >
@@ -195,17 +171,17 @@ const AddProduct = () => {
                                                         value={values.offerPercentage}
                                                         onChange={handleChange}
                                                         onBlur={handleBlur}
-                                                        disabled={values.offer === false}
+                                                        disabled={values.offer === "false"}
                                                         style={{ border: touched.offerPercentage && errors.offerPercentage ? "1px solid red" : "" }}
                                                     />
                                                     {touched.offerPercentage && errors.offerPercentage && <div className="text-danger" style={{ fontSize: "13px" }}>*{errors.offerPercentage}</div>}
                                                 </div>
 
-                                                {/* Product Images */}
+                                                {/* Cover Image */}
                                                 <div className="col-12">
-                                                    <label className="form-label" htmlFor="productImage">Product Images</label>
+                                                    <label className="form-label" htmlFor="coverImage">Cover Image</label>
                                                     <input
-                                                        id="productImage"
+                                                        id="coverImage"
                                                         className="form-control"
                                                         type="file"
                                                         onChange={handleImageChange}
@@ -225,7 +201,7 @@ const AddProduct = () => {
                                                             }}
                                                         />
                                                     }
-                                                    {touched.productImage && errors.productImage && <div className="text-danger" style={{ fontSize: "13px" }}>*{errors.productImage}</div>}
+                                                    {touched.coverImage && errors.coverImage && <div className="text-danger" style={{ fontSize: "13px" }}>*{errors.coverImage}</div>}
                                                 </div>
 
                                                 {/* Product description */}
@@ -316,7 +292,7 @@ const AddProduct = () => {
                                                     <div className="col-12">
                                                         <h5>Categories</h5>
                                                         <div className="category-list">
-                                                            {categoryData && categoryData.map((item) => (
+                                                            {categoryStateData && categoryStateData.map((item) => (
                                                                 <div className="form-check" key={item?._id}>
                                                                     <input
                                                                         className="form-check-input"
@@ -329,7 +305,7 @@ const AddProduct = () => {
                                                                         checked={values.category === item?._id} // Ensure single selection
                                                                     />
                                                                     <label className="form-check-label" htmlFor={item?._id}>
-                                                                        {item?.category_name}
+                                                                        {item?.categoryName}
                                                                     </label>
                                                                 </div>
                                                             ))}

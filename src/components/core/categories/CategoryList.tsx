@@ -1,13 +1,10 @@
-import { useDispatch, useSelector } from 'react-redux';
-import { CategoryListType, PermissionCheckResult } from '../../../config/DataTypes.config';
+import { PermissionCheckResult } from '../../../config/DataTypes.config';
 import Pagination from '../../../util/Pagination';
 import Category from './Category';
-import CustomAlert from '../../../util/CustomAlert';
-import { clearCategoryDelResp, clearDelError } from '../../../services/slices/UtilitySlice';
-import { Dispatch } from 'redux';
+import { CategoryData } from '../../../types/categoryTypes';
 
 type categoryList_props = {
-    newData: Array<CategoryListType> | undefined,
+    newData: Array<CategoryData> | undefined,
     pageCount: number,
     pageNumber: number,
     changePage: (data: { selected: number }) => void,
@@ -16,23 +13,18 @@ type categoryList_props = {
 }
 
 const CategoryList = ({ newData, pageCount, pageNumber, changePage, setCategoryID, permissionCheckResult }: categoryList_props): JSX.Element => {
-    const { category_del_resp, del_error } = useSelector((state: any) => state.utilitySlice);
-    const dispatch: Dispatch<any> = useDispatch();
 
     return (
         <>
-
             <div className="col-12 col-lg-8 d-flex">
                 <div className="card border shadow-none w-100">
                     <div className="card-body">
-                        {/* Alert */}
-                        {del_error?.success === false ? <CustomAlert type="danger" message={del_error?.message} onClose={() => dispatch(clearDelError())} /> : null}
-                        {category_del_resp?.success === true ? <CustomAlert type="success" message={category_del_resp?.message} onClose={() => dispatch(clearCategoryDelResp())} /> : null}
+
                         <div className="table-responsive">
                             <table className="table align-middle">
                                 <thead className="table-light">
                                     <tr>
-                                        <th>ID</th>
+                                        <th>Category ID</th>
                                         <th>Name</th>
                                         <th>Description</th>
                                         <th>Action</th>

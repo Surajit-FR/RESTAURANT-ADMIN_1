@@ -1,11 +1,10 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { useFormik } from "formik";
-import { CategoryResponse, CustomHeadersType } from "../config/DataTypes.config";
 import { addProductValidationSchema } from "../helper/FormValidation";
-import { clearError, clearUpdateProductRespData, getAllCategory, updateProduct } from "../services/slices/UtilitySlice";
-import CustomAlert from "./CustomAlert";
-import { REACT_APP_BASE_URL } from "../config/App.config";
+import { CategoryData } from "../types/categoryTypes";
+import { AppDispatch, RootState } from "../store/Store";
+import { getAllCategoryRequest } from "../store/reducers/CategoryReducers";
 
 interface ProductDetailsModalProps {
     modalId: string;
@@ -13,31 +12,22 @@ interface ProductDetailsModalProps {
     dataPerPage: number;
     debouncedSearchQuery: string,
     selectedCategory: string,
-    header: CustomHeadersType | undefined
 }
 
-const UpdateProductModal = ({ modalId, pageNumber, dataPerPage, debouncedSearchQuery, selectedCategory, header }: ProductDetailsModalProps) => {
-    const { category_data, update_product_resp_data, products_details_data, error } = useSelector((state: any) => state.utilitySlice);
-    const dispatch: any = useDispatch();
+const UpdateProductModal = ({ modalId, pageNumber, dataPerPage, debouncedSearchQuery, selectedCategory }: ProductDetailsModalProps) => {
+    const { categoryData } = useSelector((state: RootState) => state.categorySlice);
+    const { singleProductData } = useSelector((state: RootState) => state.productSlice);
+    const dispatch: AppDispatch = useDispatch();
 
-    const [categoryData, setCategoryData] = useState<CategoryResponse[]>([]);
+    const [categoryStateData, setCategoryStateData] = useState<Array<CategoryData>>();
     const [imagePreview, setImagePreview] = useState<string | null>(null);
 
-    const getImagUrl = (url: string): string => {
-        const subStr = "blob:"
-        if (!url.includes(subStr)) {
-            const imgUrl = `${REACT_APP_BASE_URL}${url}`;
-            return imgUrl;
-        }
-        return url;
-    };
-
-    const { values, errors, touched, handleBlur, handleChange, handleSubmit, isValid, resetForm, setFieldValue, setValues } = useFormik({
+    const { values, errors, touched, handleBlur, handleChange, handleSubmit, isValid, setFieldValue, setValues } = useFormik({
         initialValues: {
             productTitle: "",
-            offer: false,
+            offer: "false",
             offerPercentage: "",
-            productImage: null,
+            coverImage: "",
             productDescription: "",
             price: "",
             availability: "",
@@ -56,56 +46,54 @@ const UpdateProductModal = ({ modalId, pageNumber, dataPerPage, debouncedSearchQ
             formData.append("visibility", values.visibility);
             formData.append("category", values.category);
 
-            // Only append the productImage file if it's a new file, not the existing image URL
-            if (values.productImage && typeof values.productImage !== 'string') {
-                formData.append("productImage", values.productImage);
+            // Only append the coverImage file if it's a new file, not the existing image URL
+            if (values.coverImage && typeof values.coverImage !== 'string') {
+                formData.append("coverImage", values.coverImage);
             }
 
-            dispatch(updateProduct({
-                data: formData,
-                product_id: products_details_data?.data?._id,
-                page: (pageNumber + 1),
-                pageSize: dataPerPage,
-                search: debouncedSearchQuery,
-                category: selectedCategory,
-                header
-            }));
+            // dispatch(updateProduct({
+            //     data: formData,
+            //     product_id: products_details_data?.data?._id,
+            //     page: (pageNumber + 1),
+            //     pageSize: dataPerPage,
+            //     search: debouncedSearchQuery,
+            //     category: selectedCategory,
+            // }));
         }
     });
 
     useEffect(() => {
-        dispatch(getAllCategory({ header }));
-    }, [dispatch, header]);
+        dispatch(getAllCategoryRequest({
+            page: (pageNumber + 1),
+            limit: dataPerPage,
+            query: debouncedSearchQuery,
+            sortBy: 'createdAt',
+            sortType: 'desc',
+        }));
+    }, [dispatch, pageNumber, dataPerPage, debouncedSearchQuery]);
 
     useEffect(() => {
-        setCategoryData(category_data?.data);
-    }, [category_data]);
+        setCategoryStateData(categoryData?.categories);
+    }, [categoryData]);
 
     useEffect(() => {
-        if (update_product_resp_data?.success) {
-            resetForm();
-            setImagePreview(null);
-        }
-    }, [update_product_resp_data, resetForm]);
-
-    useEffect(() => {
-        if (products_details_data?.data) {
+        if (singleProductData) {
             setValues({
-                productTitle: products_details_data?.data?.productTitle || "",
-                offer: products_details_data?.data?.offer || false,
-                offerPercentage: products_details_data?.data?.offerPercentage || "",
-                productImage: products_details_data?.data?.productImage || null,
-                productDescription: products_details_data?.data?.productDescription || "",
-                price: products_details_data?.data?.price || "",
-                availability: products_details_data?.data?.availability || "",
-                visibility: products_details_data?.data?.visibility || "",
-                category: products_details_data?.data?.category?._id || "",
+                productTitle: singleProductData?.productTitle || "",
+                offer: singleProductData?.offer || "false",
+                offerPercentage: singleProductData?.offerPercentage || "",
+                coverImage: singleProductData?.coverImage || "",
+                productDescription: singleProductData?.productDescription || "",
+                price: singleProductData?.price || "",
+                availability: singleProductData?.availability || "",
+                visibility: singleProductData?.visibility || "",
+                category: singleProductData?.category?._id || "",
             });
-            if (products_details_data?.data?.productImage) {
-                setImagePreview(products_details_data?.data?.productImage);
-            }
-        }
-    }, [products_details_data, setValues]);
+            if (singleProductData?.coverImage) {
+                setImagePreview(singleProductData?.coverImage);
+            };
+        };
+    }, [singleProductData, setValues]);
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.currentTarget.files && e.currentTarget.files.length > 0) {
@@ -126,24 +114,6 @@ const UpdateProductModal = ({ modalId, pageNumber, dataPerPage, debouncedSearchQ
                     <div className="modal-body">
                         <div className="row">
                             <div className="col-lg-12 mx-auto">
-                                <div className="row d-flex justify-content-center">
-                                    <div className="col-6">
-                                        {
-                                            error?.success === false ?
-                                                <CustomAlert
-                                                    type="danger"
-                                                    message={error?.message}
-                                                    onClose={() => dispatch(clearError())}
-                                                /> : update_product_resp_data?.success === true ?
-                                                    <CustomAlert
-                                                        type="success"
-                                                        message={update_product_resp_data?.message}
-                                                        onClose={() => dispatch(clearUpdateProductRespData())}
-                                                    /> : null
-                                        }
-                                    </div>
-                                </div>
-
                                 <form className="row g-3" onSubmit={handleSubmit}>
                                     <div className="col-12 col-lg-8">
                                         <div className="card shadow-none bg-light border">
@@ -192,16 +162,16 @@ const UpdateProductModal = ({ modalId, pageNumber, dataPerPage, debouncedSearchQ
                                                         value={values?.offerPercentage}
                                                         onChange={handleChange}
                                                         onBlur={handleBlur}
-                                                        disabled={values?.offer === false}
+                                                        disabled={values?.offer === "false"}
                                                         style={{ border: touched.offerPercentage && errors.offerPercentage ? "1px solid red" : "" }}
                                                     />
                                                     {touched.offerPercentage && errors.offerPercentage && <div className="text-danger" style={{ fontSize: "13px" }}>*{errors.offerPercentage}</div>}
                                                 </div>
 
                                                 <div className="col-12">
-                                                    <label className="form-label" htmlFor="productImage">Product Images</label>
+                                                    <label className="form-label" htmlFor="coverImage">Product Images</label>
                                                     <input
-                                                        id="productImage"
+                                                        id="coverImage"
                                                         className="form-control"
                                                         type="file"
                                                         onChange={handleImageChange}
@@ -209,7 +179,7 @@ const UpdateProductModal = ({ modalId, pageNumber, dataPerPage, debouncedSearchQ
                                                     />
                                                     {imagePreview &&
                                                         <img
-                                                            src={getImagUrl(imagePreview)}
+                                                            src={imagePreview}
                                                             alt="Product Preview"
                                                             style={{
                                                                 maxWidth: "100%",
@@ -220,7 +190,7 @@ const UpdateProductModal = ({ modalId, pageNumber, dataPerPage, debouncedSearchQ
                                                             }}
                                                         />
                                                     }
-                                                    {touched.productImage && errors.productImage && <div className="text-danger" style={{ fontSize: "13px" }}>*{errors.productImage}</div>}
+                                                    {touched.coverImage && errors.coverImage && <div className="text-danger" style={{ fontSize: "13px" }}>*{errors.coverImage}</div>}
                                                 </div>
 
                                                 <div className="col-12">
@@ -305,7 +275,7 @@ const UpdateProductModal = ({ modalId, pageNumber, dataPerPage, debouncedSearchQ
                                                     <div className="col-12">
                                                         <h5>Categories</h5>
                                                         <div className="category-list">
-                                                            {categoryData && categoryData?.map((item) => (
+                                                            {categoryStateData && categoryStateData?.map((item) => (
                                                                 <div className="form-check" key={item?._id}>
                                                                     <input
                                                                         className="form-check-input"
@@ -318,7 +288,7 @@ const UpdateProductModal = ({ modalId, pageNumber, dataPerPage, debouncedSearchQ
                                                                         checked={values?.category === item?._id}
                                                                     />
                                                                     <label className="form-check-label" htmlFor={item?._id}>
-                                                                        {item?.category_name}
+                                                                        {item?.categoryName}
                                                                     </label>
                                                                 </div>
                                                             ))}

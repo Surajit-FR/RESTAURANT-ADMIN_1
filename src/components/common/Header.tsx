@@ -1,45 +1,20 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import UserDropdown from './headerItems/UserDropdown';
 import { useEffect } from 'react';
-import { jwtDecode } from 'jwt-decode';
 import { useDispatch } from 'react-redux';
-import { Dispatch } from 'redux';
-import { logoutUser } from '../../services/slices/AuthSlice';
-import toast from 'react-hot-toast';
+import { AppDispatch } from '../../store/Store';
+import { getCurrentUserRequest } from '../../store/reducers/UserReducers';
 // import BoxDropDown from './headerItems/BoxDropDown';
 // import MessageDropdown from './headerItems/MessageDropdown';
 // import NotiDropdown from './headerItems/NotiDropdown';
 // import SearchBar from './headerItems/SearchBar';
 
 const Header = (): JSX.Element => {
-    const token: string | null = window.localStorage.getItem("token");
-    const _TOKEN = JSON.parse(token ?? 'null');
-
-    const dispatch: Dispatch<any> = useDispatch()
-    const navigate: any = useNavigate()
+    const dispatch: AppDispatch = useDispatch();
 
     useEffect(() => {
-        if (_TOKEN) {
-            const decodedJwt = jwtDecode(_TOKEN);
-            const isExpired = decodedJwt?.exp ? decodedJwt.exp < Date.now() / 1000 : false;
-            if (isExpired) {
-                dispatch(logoutUser(navigate));
-                toast.error("Session Expired. You've been logged out. Please signin again.", {
-                    duration: 4000,
-                    style: {
-                        background: "#000",
-                        color: "#fff"
-                    },
-                    iconTheme: {
-                        primary: "#fff",
-                        secondary: "#f00"
-                    },
-                })
-            }
-        } else {
-            navigate('/admin/signin')
-        }
-    }, [dispatch, navigate, _TOKEN]);
+        dispatch(getCurrentUserRequest('userSlice/getCurrentUserRequest'))
+    }, [dispatch]);
 
     return (
         <>

@@ -1,44 +1,24 @@
 import React, { useEffect } from "react";
-import { DecryptData } from "../../helper/EncryptDecrypt";
-import { useDispatch, useSelector } from "react-redux";
-import { Dispatch } from "redux";
-import { clearUpdateThemeResp, updateTheme } from "../../services/slices/AuthSlice";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store/Store";
 
 const Switcher = (): JSX.Element => {
-    const { update_theme_resp } = useSelector((state: any) => state.authSlice);
-    const user: string | null = window.localStorage.getItem("user");
-    const _USER_DATA = DecryptData(user ?? 'null');
-
-    const token: string | null = window.localStorage.getItem("token");
-    const _TOKEN = JSON.parse(token ?? 'null');
-
-    const header = {
-        headers: {
-            Authorization: `Bearer ${_TOKEN}`
-        }
-    };
-
-    const dispatch: Dispatch<any> = useDispatch();
+    const { userData } = useSelector((state: RootState) => state.userSlice);
+    // const dispatch: AppDispatch = useDispatch();
 
     // Function to handle theme change
     const handleThemeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const web_theme = e.target.id;
-        dispatch(updateTheme({ data: { web_theme }, header }));
+        // const web_theme = e.target.id;
+        // dispatch(updateTheme({ data: { web_theme }, header }));
     };
 
     // Effect to update the class attribute of <html> tag when selectedTheme changes
     useEffect(() => {
         const htmlTag = document.querySelector('html');
         if (htmlTag) {
-            htmlTag.className = _USER_DATA?.web_theme || 'semi-dark';
+            htmlTag.className = userData?.user?.web_theme || 'semi-dark';
         }
-    }, [_USER_DATA?.web_theme, update_theme_resp]);
-
-    useEffect(() => {
-        return () => {
-            dispatch(clearUpdateThemeResp());
-        }
-    }, [dispatch]);
+    }, [userData?.user?.web_theme]);
 
     const switcherContainer: React.CSSProperties = {
         position: "fixed",
@@ -84,7 +64,7 @@ const Switcher = (): JSX.Element => {
                                 name="inlineRadioOptions"
                                 id="light-theme"
                                 value="option1"
-                                checked={_USER_DATA?.web_theme === 'light-theme'}
+                                checked={userData?.user?.web_theme === 'light-theme'}
                                 onChange={handleThemeChange}
                             />
                             <label className="form-check-label" htmlFor="light-theme"><i className="lni lni-sun"></i> Light</label>
@@ -98,7 +78,7 @@ const Switcher = (): JSX.Element => {
                                 name="inlineRadioOptions"
                                 id="dark-theme"
                                 value="option2"
-                                checked={_USER_DATA?.web_theme === 'dark-theme'}
+                                checked={userData?.user?.web_theme === 'dark-theme'}
                                 onChange={handleThemeChange}
                             />
                             <label className="form-check-label" htmlFor="dark-theme"><i className="lni lni-night"></i> Dark</label>
@@ -112,7 +92,7 @@ const Switcher = (): JSX.Element => {
                                 name="inlineRadioOptions"
                                 id="semi-dark"
                                 value="option3"
-                                checked={_USER_DATA?.web_theme === 'semi-dark'}
+                                checked={userData?.user?.web_theme === 'semi-dark'}
                                 onChange={handleThemeChange}
                             />
                             <label className="form-check-label" htmlFor="semi-dark"><i className="lni lni-cloudy-sun"></i> Semi Dark</label>
@@ -127,7 +107,7 @@ const Switcher = (): JSX.Element => {
                                 name="inlineRadioOptions"
                                 id="minimal-theme"
                                 value="option3"
-                                checked={_USER_DATA?.web_theme === 'minimal-theme'}
+                                checked={userData?.user?.web_theme === 'minimal-theme'}
                                 onChange={handleThemeChange}
                             />
                             <label className="form-check-label" htmlFor="minimal-theme"><i className="lni lni-bolt-alt"></i> Minimal Theme</label>

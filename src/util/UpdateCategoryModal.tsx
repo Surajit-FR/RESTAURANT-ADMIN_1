@@ -1,32 +1,39 @@
-import { CategoryListType, CustomHeadersType } from "../config/DataTypes.config";
 import { useFormik } from "formik";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useEffect } from "react";
 import { categoryValidationSchema } from "../helper/FormValidation";
-import CustomAlert from "./CustomAlert";
-import { clearCatError, clearUpdateCategoryRespData, updateCategory } from "../services/slices/UtilitySlice";
+import { CategoryData } from "../types/categoryTypes";
+import { AppDispatch } from "../store/Store";
+import { updateCategoryRequest } from "../store/reducers/CategoryReducers";
 
 interface ProductDetailsModalProps {
     modalId: string,
-    categoryData: CategoryListType | undefined,
+    categoryData: CategoryData | undefined,
     pageNumber: number,
     dataPerPage: number,
-    header: CustomHeadersType | undefined
 }
 
-const UpdateCategoryModal = ({ modalId, categoryData, pageNumber, dataPerPage, header }: ProductDetailsModalProps): JSX.Element => {
-    const { update_category_resp_data, update_cat_error } = useSelector((state: any) => state.utilitySlice);
-    const dispatch: any = useDispatch();
+const UpdateCategoryModal = ({ modalId, categoryData, pageNumber, dataPerPage }: ProductDetailsModalProps): JSX.Element => {
+    const dispatch: AppDispatch = useDispatch();
 
     // taking form values
     const { values, errors, touched, handleBlur, handleChange, handleSubmit, isValid, resetForm, setValues } = useFormik({
         initialValues: {
-            category_name: "",
-            category_desc: "",
+            categoryName: "",
+            categoryDesc: "",
         },
         validationSchema: categoryValidationSchema,
         onSubmit: (values) => {
-            dispatch(updateCategory({ data: values, page: (pageNumber + 1), pageSize: dataPerPage, category_id: categoryData?._id, header }));
+            dispatch(updateCategoryRequest({
+                categoryId: categoryData?._id,
+                data: values,
+                page: (pageNumber + 1),
+                limit: dataPerPage,
+                query: '',
+                sortBy: 'createdAt',
+                sortType: 'desc',
+                resetForm
+            }));
         }
     });
 
@@ -39,16 +46,10 @@ const UpdateCategoryModal = ({ modalId, categoryData, pageNumber, dataPerPage, h
     };
 
     useEffect(() => {
-        if (update_category_resp_data?.success) {
-            resetForm();
-        }
-    }, [update_category_resp_data, resetForm]);
-
-    useEffect(() => {
         if (categoryData) {
             setValues({
-                category_name: categoryData?.category_name || "",
-                category_desc: categoryData?.category_desc || "",
+                categoryName: categoryData?.categoryName || "",
+                categoryDesc: categoryData?.categoryDesc || "",
             });
         }
     }, [categoryData, setValues]);
@@ -61,27 +62,12 @@ const UpdateCategoryModal = ({ modalId, categoryData, pageNumber, dataPerPage, h
                         <div className="modal-header">
                             {/* Heading */}
                             <h4 className="modal-title">Update Category</h4>
-                            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={() => dispatch(clearUpdateCategoryRespData())}></button>
+                            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div className="modal-body">
                             <div className="col-12 col-lg-12 d-flex">
                                 <div className="card border shadow-none w-100">
                                     <div className="card-body">
-
-                                        {/* Alert */}
-                                        {
-                                            update_cat_error?.success === false ?
-                                                <CustomAlert
-                                                    type="danger"
-                                                    message={update_cat_error?.message}
-                                                    onClose={() => dispatch(clearCatError())}
-                                                /> : update_category_resp_data?.success === true ?
-                                                    <CustomAlert
-                                                        type="success"
-                                                        message={update_category_resp_data?.message}
-                                                        onClose={() => dispatch(clearUpdateCategoryRespData())}
-                                                    /> : null
-                                        }
 
                                         <form className="row g-3" onSubmit={handleSubmit}>
                                             {/* Category Name */}
@@ -92,14 +78,14 @@ const UpdateCategoryModal = ({ modalId, categoryData, pageNumber, dataPerPage, h
                                                     type="text"
                                                     className="form-control"
                                                     placeholder="Category name"
-                                                    name="category_name"
-                                                    value={values?.category_name || ""}
+                                                    name="categoryName"
+                                                    value={values?.categoryName || ""}
                                                     onChange={handleChange}
                                                     onBlur={handleBlur}
-                                                    style={{ border: touched?.category_name && errors?.category_name ? "1px solid red" : "" }}
+                                                    style={{ border: touched?.categoryName && errors?.categoryName ? "1px solid red" : "" }}
                                                 />
                                             </div>
-                                            {touched?.category_name && renderError(errors?.category_name)}
+                                            {touched?.categoryName && renderError(errors?.categoryName)}
 
                                             {/* Category Description */}
                                             <div className="col-12">
@@ -109,9 +95,9 @@ const UpdateCategoryModal = ({ modalId, categoryData, pageNumber, dataPerPage, h
                                                     className="form-control"
                                                     rows={3}
                                                     cols={3}
-                                                    name="category_desc"
+                                                    name="categoryDesc"
                                                     placeholder="Category Description"
-                                                    value={values?.category_desc || ""}
+                                                    value={values?.categoryDesc || ""}
                                                     onChange={handleChange}
                                                 ></textarea>
                                             </div>

@@ -1,7 +1,7 @@
 import ReactPaginate from "react-paginate";
-import { Pagination_Type } from "../config/DataTypes.config";
+import { Pagination_PropsType } from "../types/common";
 
-const Pagination = ({ pageCount, pageNumber, changePage }: Pagination_Type): JSX.Element => {
+const Pagination = ({ pageCount, pageNumber, changePage }: Pagination_PropsType): JSX.Element => {
     return (
         <>
             <ul className="pagination">
