@@ -23,6 +23,18 @@ const UserSlice = createSlice({
             state.type = type;
             state.error = payload;
         },
+
+        // Update theme
+        updateThemeRequest: (state, { payload, type }) => {
+            state.type = type;
+        },
+        updateThemeSuccess: (state, { payload, type }) => {
+            state.type = type;
+        },
+        updateThemeFailure: (state, { payload, type }) => {
+            state.type = type;
+            state.error = payload;
+        },
     }
 });
 
@@ -30,6 +42,10 @@ export const {
     getCurrentUserRequest,
     getCurrentUserSuccess,
     getCurrentUserFailure,
+
+    updateThemeRequest,
+    updateThemeSuccess,
+    updateThemeFailure,
 } = UserSlice.actions;
 
 export default UserSlice.reducer;

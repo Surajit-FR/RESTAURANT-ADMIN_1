@@ -9,6 +9,10 @@ export type UseOutsideClickReturn<T> = {
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
 };
 
+export type WebThemeType = {
+    web_theme: string;
+};
+
 export type ChannelStats = {
     totalViews: number,
     totalVideos: number,

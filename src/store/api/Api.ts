@@ -3,6 +3,7 @@ import { REACT_APP_BASE_URL } from "../../config/App.config";
 import { TLoginCredentials, TRegisterCredentials } from "../../types/authTypes";
 import { GetAllCategoryParams, TCategory } from "../../types/categoryTypes";
 import { GetAllProductParams, TProduct } from "../../types/productTypes";
+import { WebThemeType } from "../../types/common";
 
 // Create axios instance
 export const API = axios.create({ baseURL: REACT_APP_BASE_URL, withCredentials: true });
@@ -85,6 +86,8 @@ export const LOGIN = (data: TLoginCredentials) => API.post("/auth/signin", data)
 export const LOGOUT = () => API.post("/auth/logout");
 // Current user
 export const CURRENTUSER = () => API.get("/user/current-user");
+// Update theme
+export const THEMEUPDATE = (data: WebThemeType) => API.patch("/user/update-theme", data);
 
 // Add category
 export const ADDCATEGORY = (data: TCategory) => API.post("/category", data);

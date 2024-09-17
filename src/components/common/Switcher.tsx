@@ -1,15 +1,16 @@
 import React, { useEffect } from "react";
-import { useSelector } from "react-redux";
-import { RootState } from "../../store/Store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../store/Store";
+import { updateThemeRequest } from "../../store/reducers/UserReducers";
 
 const Switcher = (): JSX.Element => {
     const { userData } = useSelector((state: RootState) => state.userSlice);
-    // const dispatch: AppDispatch = useDispatch();
+    const dispatch: AppDispatch = useDispatch();
 
     // Function to handle theme change
     const handleThemeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        // const web_theme = e.target.id;
-        // dispatch(updateTheme({ data: { web_theme }, header }));
+        const web_theme = e.target.id;
+        dispatch(updateThemeRequest({ data: { web_theme } }));
     };
 
     // Effect to update the class attribute of <html> tag when selectedTheme changes
