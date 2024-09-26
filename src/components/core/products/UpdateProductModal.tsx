@@ -1,43 +1,56 @@
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import { addProductValidationSchema } from "../../../helper/FormValidation";
+import { CategoryData } from "../../../types/categoryTypes";
 import { AppDispatch, RootState } from "../../../store/Store";
 import { getAllCategoryRequest } from "../../../store/reducers/CategoryReducers";
-import { CategoryData } from "../../../types/categoryTypes";
-import { addProductRequest } from "../../../store/reducers/ProductReducers";
+import { updateProductRequest } from "../../../store/reducers/ProductReducers";
 
-const AddProduct = () => {
+interface ProductDetailsModalProps {
+    modalId: string;
+    pageNumber: number;
+    dataPerPage: number;
+    debouncedSearchQuery: string;
+    selectedCategory: string;
+}
+
+const UpdateProductModal = ({
+    modalId,
+    pageNumber,
+    dataPerPage,
+    debouncedSearchQuery,
+    selectedCategory,
+}: ProductDetailsModalProps) => {
     const { categoryData } = useSelector((state: RootState) => state.categorySlice);
+    const { singleProductData } = useSelector((state: RootState) => state.productSlice);
     const dispatch: AppDispatch = useDispatch();
-    const navigate = useNavigate();
 
     const [categoryStateData, setCategoryStateData] = useState<Array<CategoryData>>();
     const [coverImagePreview, setCoverImagePreview] = useState<string | null>(null);
     const [productImagesPreview, setProductImagesPreview] = useState<string[]>([]);
 
-    const { values, errors, touched, handleBlur, handleChange, handleSubmit, isValid, setFieldValue, setFieldTouched, resetForm } = useFormik({
+    const { values, errors, touched, handleBlur, handleChange, handleSubmit, isValid, setFieldValue, setValues, setFieldTouched, resetForm } = useFormik({
         initialValues: {
             productTitle: "",
             sku: "",
             offer: "false",
             offerPercentage: "",
             coverImage: "",
-            productImages: [],
+            productImages: [] as Array<string>,
             productDescription: "",
             price: "",
             availability: "in_stock",
             visibility: "public",
             category: "",
-            tags: [],
+            tags: [] as Array<string>,
         },
         validationSchema: addProductValidationSchema,
         onSubmit: (values) => {
             const formData = new FormData();
             formData.append("productTitle", values.productTitle);
             formData.append("sku", values.sku);
-            formData.append("offer", values.offer.toString());
+            formData.append("offer", values.offer);
             formData.append("offerPercentage", values.offerPercentage);
             formData.append("productDescription", values.productDescription);
             formData.append("price", values.price);
@@ -58,8 +71,18 @@ const AddProduct = () => {
                 formData.append("productImages", image);
             });
 
-            dispatch(addProductRequest({ data: formData, resetForm }));
-        }
+            dispatch(updateProductRequest({
+                data: formData,
+                productId: singleProductData?._id,
+                resetForm,
+                page: (pageNumber + 1),
+                limit: dataPerPage,
+                query: debouncedSearchQuery,
+                sortBy: 'createdAt',
+                sortType: 'desc',
+                filterId: selectedCategory,
+            }));
+        },
     });
 
     // Function to handle adding a tag
@@ -67,19 +90,19 @@ const AddProduct = () => {
         if (e.key === 'Enter' && e.currentTarget.value.trim()) {
             e.preventDefault();
             const newTag = e.currentTarget.value.trim();
-            // Use the spread operator to create a new array with the existing tags and the new tag
-            setFieldValue("tags", [...values.tags, newTag]); // Add new tag to the array
+
+            setFieldValue("tags", [...values.tags, newTag]);
             setFieldTouched("tags", true, true);
-            e.currentTarget.value = ''; // Clear the input field after adding the tag
+            e.currentTarget.value = '';
         }
     };
 
     // Function to remove a tag
     const handleRemoveTag = (tag: string) => {
-        setFieldValue("tags", values.tags.filter(t => t !== tag));  // Remove the tag from the array
+        setFieldValue("tags", values.tags.filter(t => t !== tag));
     };
 
-    // Handle single cover image preview
+
     const handleCoverImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.currentTarget.files && e.currentTarget.files.length > 0) {
             const file = e.currentTarget.files[0];
@@ -88,67 +111,78 @@ const AddProduct = () => {
         }
     };
 
-    // Handle multiple product images preview
     const handleProductImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = Array.from(e.currentTarget.files || []);
-        setProductImagesPreview(files.map((file) => URL.createObjectURL(file)));
+        const filePreviews = files.map((file) => URL.createObjectURL(file));
+        setProductImagesPreview(filePreviews);
         setFieldValue("productImages", files);
-        setFieldTouched("productImages", true);
     };
 
-    // Add this function to handle removing product images
     const handleRemoveProductImage = (index: number) => {
         const updatedImages = [...productImagesPreview];
-        updatedImages.splice(index, 1); // Remove the image at the given index
-        setProductImagesPreview(updatedImages); // Update the preview state
+        updatedImages.splice(index, 1);
+        setProductImagesPreview(updatedImages);
         const updatedFiles = [...values.productImages];
-        updatedFiles.splice(index, 1); // Remove the corresponding file from the state
-        setFieldValue("productImages", updatedFiles); // Update the form state
+        updatedFiles.splice(index, 1);
+        setFieldValue("productImages", updatedFiles);
     };
 
     useEffect(() => {
         dispatch(getAllCategoryRequest({
-            page: "",
-            limit: "",
-            query: "",
+            page: (pageNumber + 1),
+            limit: dataPerPage,
+            query: debouncedSearchQuery,
             sortBy: 'createdAt',
             sortType: 'desc',
         }));
-    }, [dispatch]);
+    }, [dispatch, pageNumber, dataPerPage, debouncedSearchQuery]);
 
     useEffect(() => {
         setCategoryStateData(categoryData?.categories);
     }, [categoryData]);
 
+    useEffect(() => {
+        if (singleProductData) {
+            setValues({
+                productTitle: singleProductData?.productTitle || "",
+                sku: singleProductData?.sku || "",
+                offer: singleProductData?.offer || "false",
+                offerPercentage: singleProductData?.offerPercentage || "",
+                coverImage: singleProductData?.coverImage || "",
+                productDescription: singleProductData?.productDescription || "",
+                price: singleProductData?.price || "",
+                availability: singleProductData?.availability || "",
+                visibility: singleProductData?.visibility || "",
+                category: singleProductData?.category?._id || "",
+                productImages: singleProductData?.productImages || [],
+                tags: singleProductData?.tags || [],
+            });
+            if (singleProductData?.coverImage) {
+                setCoverImagePreview(singleProductData?.coverImage);
+            }
+
+            if (singleProductData.productImages) {
+                setProductImagesPreview(singleProductData.productImages);
+            }
+        }
+    }, [singleProductData, setValues]);
+
 
     return (
         <>
-            <main className="page-content">
-                <div className="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
-                    <div className="breadcrumb-title pe-3">Product & Category</div>
-                    <div className="ps-3">
-                        <nav aria-label="breadcrumb">
-                            <ol className="breadcrumb mb-0 p-0">
-                                <li className="breadcrumb-item"><Link to="#"><i className="bx bx-home-alt"></i></Link></li>
-                                <li className="breadcrumb-item" style={{ cursor: "pointer" }} onClick={() => navigate('/products')}>Products</li>
-                                <li className="breadcrumb-item active" aria-current="page">Add New Product</li>
-                            </ol>
-                        </nav>
-                    </div>
-                </div>
-
-                <div className="row">
-                    <div className="col-lg-12 mx-auto">
-                        <div className="card">
-                            <div className="card-header py-3 bg-transparent">
-                                <h5 className="mb-2 mb-sm-0">Add New Product</h5>
-                            </div>
-                            <div className="card-body">
-                                <form className="row g-3" onSubmit={handleSubmit}>
-                                    <div className="col-12 col-lg-8">
-                                        <div className="card shadow-none bg-light border">
-                                            <div className="row g-3 card-body">
-
+            <div className="modal fade" id={modalId} tabIndex={-1} aria-hidden="true" data-bs-backdrop="static">
+                <div className="modal-dialog modal-xl">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h4 className="modal-title">Update Product</h4>
+                            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div className="modal-body">
+                            <form className="row g-3" onSubmit={handleSubmit}>
+                                <div className="col-12 col-lg-8">
+                                    <div className="card shadow-none bg-light border">
+                                        <div className="card-body">
+                                            <div className="row g-3">
                                                 <div className="col-12">
                                                     <label className="form-label">Product title</label>
                                                     <input
@@ -161,7 +195,9 @@ const AddProduct = () => {
                                                         onBlur={handleBlur}
                                                         style={{ border: touched.productTitle && errors.productTitle ? "1px solid red" : "" }}
                                                     />
-                                                    {touched.productTitle && errors.productTitle && <div className="text-danger" style={{ fontSize: "13px" }}>*{errors.productTitle}</div>}
+                                                    {touched.productTitle && errors.productTitle && (
+                                                        <div className="text-danger" style={{ fontSize: "13px" }}>*{errors.productTitle}</div>
+                                                    )}
                                                 </div>
 
                                                 <div className="col-12">
@@ -176,20 +212,20 @@ const AddProduct = () => {
                                                         onBlur={handleBlur}
                                                         style={{ border: touched.sku && errors.sku ? "1px solid red" : "" }}
                                                     />
-                                                    {touched.sku && errors.sku && <div className="text-danger" style={{ fontSize: "13px" }}>*{errors.sku}</div>}
+                                                    {touched.sku && errors.sku && (
+                                                        <div className="text-danger" style={{ fontSize: "13px" }}>*{errors.sku}</div>
+                                                    )}
                                                 </div>
 
                                                 <div className="col-12">
                                                     <label className="form-label">Tags</label>
                                                     <div className="tags-input-container">
-                                                        {/* Display current tags */}
                                                         {values.tags.map((tag, index) => (
                                                             <div key={index} className="tag mb-2">
                                                                 {tag}
                                                                 <span className="tag-remove" onClick={() => handleRemoveTag(tag)}>x</span>
                                                             </div>
                                                         ))}
-                                                        {/* Input for adding new tags */}
                                                         <input
                                                             type="text"
                                                             className="form-control"
@@ -197,7 +233,9 @@ const AddProduct = () => {
                                                             onKeyDown={handleAddTag}
                                                         />
                                                     </div>
-                                                    {touched.tags && errors.tags && <div className="text-danger" style={{ fontSize: "13px" }}>*{errors.tags}</div>}
+                                                    {touched.tags && errors.tags && (
+                                                        <div className="text-danger" style={{ fontSize: "13px" }}>*{errors.tags}</div>
+                                                    )}
                                                 </div>
 
                                                 <div className="col-12 col-lg-6">
@@ -212,7 +250,9 @@ const AddProduct = () => {
                                                         <option value="true">Yes</option>
                                                         <option value="false">No</option>
                                                     </select>
-                                                    {touched.offer && errors.offer && <div className="text-danger" style={{ fontSize: "13px" }}>*{errors.offer}</div>}
+                                                    {touched.offer && errors.offer && (
+                                                        <div className="text-danger" style={{ fontSize: "13px" }}>*{errors.offer}</div>
+                                                    )}
                                                 </div>
 
                                                 <div className="col-12 col-lg-6">
@@ -228,7 +268,9 @@ const AddProduct = () => {
                                                         disabled={values.offer === "false"}
                                                         style={{ border: touched.offerPercentage && errors.offerPercentage ? "1px solid red" : "" }}
                                                     />
-                                                    {touched.offerPercentage && errors.offerPercentage && <div className="text-danger" style={{ fontSize: "13px" }}>*{errors.offerPercentage}</div>}
+                                                    {touched.offerPercentage && errors.offerPercentage && (
+                                                        <div className="text-danger" style={{ fontSize: "13px" }}>*{errors.offerPercentage}</div>
+                                                    )}
                                                 </div>
 
                                                 <div className="col-12">
@@ -293,7 +335,7 @@ const AddProduct = () => {
                                                                         }}
                                                                         title="Remove Image"
                                                                     >
-                                                                        &times; {/* Cross icon */}
+                                                                        &times;
                                                                     </button>
                                                                 </div>
                                                             ))}
@@ -320,102 +362,111 @@ const AddProduct = () => {
                                                         onChange={handleChange}
                                                         onBlur={handleBlur}
                                                     ></textarea>
-                                                    {touched.productDescription && errors.productDescription && <div className="text-danger" style={{ fontSize: "13px" }}>*{errors.productDescription}</div>}
+                                                    {touched.productDescription && errors.productDescription && (
+                                                        <div className="text-danger" style={{ fontSize: "13px" }}>*{errors.productDescription}</div>
+                                                    )}
                                                 </div>
 
                                                 <div className="ms-auto">
-                                                    <button type="submit" className="btn btn-primary" disabled={!isValid}>Add Product</button>
+                                                    <button type="submit" className="btn btn-primary" disabled={!isValid}>Update Product</button>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
+                                </div>
 
-                                    <div className="col-12 col-lg-4">
-                                        <div className="card shadow-none bg-light border">
-                                            <div className="card-body">
-                                                <div className="row g-3">
-                                                    <div className="col-12">
-                                                        <label className="form-label">Price</label>
-                                                        <input
-                                                            type="text"
-                                                            className="form-control"
-                                                            placeholder="Price"
-                                                            name="price"
-                                                            value={values.price}
-                                                            onChange={handleChange}
-                                                            onBlur={handleBlur}
-                                                            style={{ border: touched.price && errors.price ? "1px solid red" : "" }}
-                                                        />
-                                                        {touched.price && errors.price && <div className="text-danger" style={{ fontSize: "13px" }}>*{errors.price}</div>}
-                                                    </div>
+                                <div className="col-12 col-lg-4">
+                                    <div className="card shadow-none bg-light border">
+                                        <div className="card-body">
+                                            <div className="row g-3">
+                                                <div className="col-12">
+                                                    <label className="form-label">Price</label>
+                                                    <input
+                                                        type="text"
+                                                        className="form-control"
+                                                        placeholder="Price"
+                                                        name="price"
+                                                        value={values.price}
+                                                        onChange={handleChange}
+                                                        onBlur={handleBlur}
+                                                        style={{ border: touched.price && errors.price ? "1px solid red" : "" }}
+                                                    />
+                                                    {touched.price && errors.price && (
+                                                        <div className="text-danger" style={{ fontSize: "13px" }}>*{errors.price}</div>
+                                                    )}
+                                                </div>
 
-                                                    <div className="col-12">
-                                                        <label className="form-label">Availability</label>
-                                                        <select
-                                                            className="form-select"
-                                                            name="availability"
-                                                            value={values.availability}
-                                                            onChange={handleChange}
-                                                            onBlur={handleBlur}
-                                                        >
-                                                            <option value="in_stock">In Stock</option>
-                                                            <option value="out_of_stock">Out Of Stock</option>
-                                                            <option value="pre_order">Pre Order</option>
-                                                        </select>
-                                                        {touched.availability && errors.availability && <div className="text-danger" style={{ fontSize: "13px" }}>*{errors.availability}</div>}
-                                                    </div>
+                                                <div className="col-12">
+                                                    <label className="form-label">Availability</label>
+                                                    <select
+                                                        className="form-select"
+                                                        name="availability"
+                                                        value={values.availability}
+                                                        onChange={handleChange}
+                                                        onBlur={handleBlur}
+                                                    >
+                                                        <option value="in_stock">In Stock</option>
+                                                        <option value="out_of_stock">Out Of Stock</option>
+                                                        <option value="pre_order">Pre Order</option>
+                                                    </select>
+                                                    {touched.availability && errors.availability && (
+                                                        <div className="text-danger" style={{ fontSize: "13px" }}>*{errors.availability}</div>
+                                                    )}
+                                                </div>
 
-                                                    <div className="col-12">
-                                                        <label className="form-label">Product Visibility</label>
-                                                        <select
-                                                            className="form-select"
-                                                            name="visibility"
-                                                            value={values.visibility}
-                                                            onChange={handleChange}
-                                                            onBlur={handleBlur}
-                                                        >
-                                                            <option value="public">Public</option>
-                                                            <option value="private">Private</option>
-                                                        </select>
-                                                        {touched.visibility && errors.visibility && <div className="text-danger" style={{ fontSize: "13px" }}>*{errors.visibility}</div>}
-                                                    </div>
+                                                <div className="col-12">
+                                                    <label className="form-label">Product Visibility</label>
+                                                    <select
+                                                        className="form-select"
+                                                        name="visibility"
+                                                        value={values.visibility}
+                                                        onChange={handleChange}
+                                                        onBlur={handleBlur}
+                                                    >
+                                                        <option value="public">Public</option>
+                                                        <option value="private">Private</option>
+                                                    </select>
+                                                    {touched.visibility && errors.visibility && (
+                                                        <div className="text-danger" style={{ fontSize: "13px" }}>*{errors.visibility}</div>
+                                                    )}
+                                                </div>
 
-                                                    <div className="col-12">
-                                                        <h5>Categories</h5>
-                                                        <div className="category-list">
-                                                            {categoryStateData && categoryStateData.map((item) => (
-                                                                <div className="form-check" key={item?._id}>
-                                                                    <input
-                                                                        className="form-check-input"
-                                                                        type="radio"
-                                                                        id={item?._id}
-                                                                        name="category"
-                                                                        value={item?._id}
-                                                                        onChange={handleChange}
-                                                                        onBlur={handleBlur}
-                                                                        checked={values.category === item?._id}
-                                                                    />
-                                                                    <label className="form-check-label" htmlFor={item?._id}>
-                                                                        {item?.categoryName}
-                                                                    </label>
-                                                                </div>
-                                                            ))}
-                                                            {errors.category && <div className="text-danger" style={{ fontSize: "13px" }}>*{errors.category}</div>}
-                                                        </div>
+                                                <div className="col-12">
+                                                    <h5>Categories</h5>
+                                                    <div className="category-list">
+                                                        {categoryStateData && categoryStateData.map((item) => (
+                                                            <div className="form-check" key={item?._id}>
+                                                                <input
+                                                                    className="form-check-input"
+                                                                    type="radio"
+                                                                    id={item?._id}
+                                                                    name="category"
+                                                                    value={item?._id}
+                                                                    onChange={handleChange}
+                                                                    onBlur={handleBlur}
+                                                                    checked={values.category === item?._id}
+                                                                />
+                                                                <label className="form-check-label" htmlFor={item?._id}>
+                                                                    {item?.categoryName}
+                                                                </label>
+                                                            </div>
+                                                        ))}
+                                                        {errors.category && (
+                                                            <div className="text-danger" style={{ fontSize: "13px" }}>*{errors.category}</div>
+                                                        )}
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-
-                                </form>
-                            </div>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
-            </main>
+            </div>
         </>
     );
 };
 
-export default AddProduct;
+export default UpdateProductModal;

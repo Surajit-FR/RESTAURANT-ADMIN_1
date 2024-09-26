@@ -1,5 +1,5 @@
 import { PermissionCheckResult } from '../../../config/DataTypes.config';
-import Pagination from '../../../util/Pagination';
+import Pagination from '../../Pagination';
 import Category from './Category';
 import { CategoryData } from '../../../types/categoryTypes';
 

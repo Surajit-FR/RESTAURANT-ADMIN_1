@@ -48,6 +48,7 @@ export type GetAPIParams = {
     query?: string,
     sortBy?: string,
     sortType?: 'asc' | 'desc',
+    filterId?: string,
 };
 
 export type Pagination = {

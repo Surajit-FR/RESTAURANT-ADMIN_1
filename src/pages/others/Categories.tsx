@@ -3,13 +3,13 @@ import AddCategory from "../../components/core/categories/AddCategory";
 import CategoryList from "../../components/core/categories/CategoryList";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useMemo, useState } from "react";
-import ConfModal from "../../util/ConfModal";
+import ConfModal from "../../components/ConfModal";
 import { REACT_APP_CATEGORY_PER_PAGE } from "../../config/App.config";
-import UpdateCategoryModal from "../../util/UpdateCategoryModal";
 import { checkPermissions, permissionsToCheck } from "../../helper/CheckPermissions";
 import { deleteCategoryRequest, getAllCategoryRequest } from "../../store/reducers/CategoryReducers";
 import { AppDispatch, RootState } from "../../store/Store";
 import { CategoryData } from "../../types/categoryTypes";
+import UpdateCategoryModal from "../../components/core/categories/UpdateCategoryModal";
 
 const Categories = (): JSX.Element => {
     const { categoryData } = useSelector((state: RootState) => state.categorySlice);

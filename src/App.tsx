@@ -3,7 +3,7 @@ import Switcher from './components/common/Switcher';
 import Sidebar from './components/common/Sidebar';
 import BackOnTop from './components/common/BackOnTop';
 import AllRoutes from './routes/AllRoutes';
-import Loader from './util/Loader';
+import Loader from './components/Loader';
 import { useSelector } from 'react-redux';
 import { RootState } from './store/Store';
 import { isCategoryLoading, isProductLoading } from './util/loading';

@@ -1,10 +1,10 @@
 import { useFormik } from "formik";
 import { useDispatch } from "react-redux";
 import { useEffect } from "react";
-import { categoryValidationSchema } from "../helper/FormValidation";
-import { CategoryData } from "../types/categoryTypes";
-import { AppDispatch } from "../store/Store";
-import { updateCategoryRequest } from "../store/reducers/CategoryReducers";
+import { CategoryData } from "../../../types/categoryTypes";
+import { categoryValidationSchema } from "../../../helper/FormValidation";
+import { AppDispatch } from "../../../store/Store";
+import { updateCategoryRequest } from "../../../store/reducers/CategoryReducers";
 
 interface ProductDetailsModalProps {
     modalId: string,

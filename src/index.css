@@ -1,0 +1,22 @@
+.tags-input-container {
+    display: flex;
+    flex-wrap: wrap;
+    /* border: 1px solid #2c364a;
+    border-radius: 5px; */
+    padding: 5px;
+}
+
+.tag {
+    background-color: #2c364a;
+    border-radius: 4px;
+    padding: 5px 10px;
+    margin-right: 5px;
+    display: flex;
+    align-items: center;
+}
+
+.tag-remove {
+    margin-left: 5px;
+    color: red;
+    cursor: pointer;
+}

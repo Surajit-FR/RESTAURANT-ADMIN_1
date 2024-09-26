@@ -29,7 +29,7 @@ export function* addProductSaga({ payload, type }: { payload: ProductPayload, ty
         const result: ApiResponse<null> = resp?.data;
         if (result?.success) {
             payload.resetForm();
-            showToast({ message: result?.message || 'Product added successfully', type: 'success', durationTime: 3500, position: "top-center" });
+            showToast({ message: result?.message || 'Product added successfully', type: 'success', durationTime: 6000, position: "top-center" });
             yield put(addProductSuccess(result));
         };
     } catch (error: any) {
@@ -68,17 +68,19 @@ export function* updateProductSaga({ payload, type }: { payload: ProductPayload,
     try {
         const resp = yield call(UPDATEPRODUCT, payload?.data, payload?.productId);
         const result: ApiResponse<null> = resp?.data;
+        
         if (result?.success) {
             payload.resetForm();
-            showToast({ message: result?.message || 'Category updated successfully', type: 'success', durationTime: 3500, position: "top-center" });
+            showToast({ message: result?.message || 'Product updated successfully', type: 'success', durationTime: 6000, position: "top-center" });
             yield put(updateProductSuccess(result));
-
+            
             const params: GetAPIParams = {
                 page: payload?.page,
                 limit: payload?.limit,
                 query: payload?.query,
                 sortBy: payload?.sortBy,
                 sortType: payload?.sortType,
+                filterId: payload?.selectedCategory
             };
             yield put(getAllProductRequest(params));
         };
@@ -102,6 +104,7 @@ export function* deleteProductSaga({ payload, type }: { payload: ProductPayload,
                 query: payload?.query,
                 sortBy: payload?.sortBy,
                 sortType: payload?.sortType,
+                filterId: payload?.selectedCategory
             };
             yield put(getAllProductRequest(params));
         };

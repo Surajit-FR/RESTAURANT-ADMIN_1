@@ -36,5 +36,6 @@ export type ProductResponse = {
 export type ProductPayload = GetAPIParams & {
     data: TProduct;
     productId: string;
+    selectedCategory: string;
     resetForm: Function;
 };

@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useFormik } from 'formik';
 import { loginValidationSchema } from '../../helper/FormValidation';
 // import CustomAlert from '../../util/CustomAlert';
-import Loader from '../../util/Loader';
+import Loader from '../../components/Loader';
 import { AppDispatch } from '../../store/Store';
 import { LoginRequest } from '../../store/reducers/AuthReducers';
 import { TLoginCredentials } from '../../types/authTypes';

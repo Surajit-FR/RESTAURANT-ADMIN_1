@@ -1,19 +1,19 @@
 import { Link } from "react-router-dom";
-import Pagination from "../../util/Pagination";
+import Pagination from "../../components/Pagination";
 import { useEffect, useState } from "react";
 import Product from "../../components/core/products/Product";
 import { useDispatch, useSelector } from "react-redux";
 import { REACT_APP_PRODUCT_PER_PAGE } from "../../config/App.config";
 import Search from "../../components/common/Search";
-import ConfModal from "../../util/ConfModal";
-import ProductDetailsModal from "../../util/ProductDetailsModal";
-import UpdateProductModal from "../../util/UpdateProductModal";
+import ConfModal from "../../components/ConfModal";
+import UpdateProductModal from "../../components/core/products/UpdateProductModal";
 import { checkPermissions, permissionsToCheck } from "../../helper/CheckPermissions";
 import { AppDispatch, RootState } from "../../store/Store";
 import { ProductData } from "../../types/productTypes";
 import { CategoryData } from "../../types/categoryTypes";
-import { getAllProductRequest } from "../../store/reducers/ProductReducers";
+import { deleteProductRequest, getAllProductRequest } from "../../store/reducers/ProductReducers";
 import { getAllCategoryRequest } from "../../store/reducers/CategoryReducers";
+import ProductDetailsModal from "../../components/core/products/ProductDetailsModal";
 
 const Products = (): JSX.Element => {
     const { categoryData } = useSelector((state: RootState) => state.categorySlice);
@@ -39,14 +39,15 @@ const Products = (): JSX.Element => {
 
     const handleDelete = () => {
         if (categoryStateData) {
-            // dispatch(deleteProduct({
-            //     product_id: productID,
-            //     page: (pageNumber + 1),
-            //     pageSize: dataPerPage,
-            //     search: debouncedSearchQuery,
-            //     category: selectedCategory,
-            //     header
-            // }));
+            dispatch(deleteProductRequest({
+                productId: productID,
+                page: (pageNumber + 1),
+                limit: dataPerPage,
+                query: debouncedSearchQuery,
+                sortBy: 'createdAt',
+                sortType: 'desc',
+                filterId: selectedCategory,
+            }));
         };
     };
 
@@ -79,6 +80,7 @@ const Products = (): JSX.Element => {
             query: debouncedSearchQuery,
             sortBy: 'createdAt',
             sortType: 'desc',
+            filterId: selectedCategory,
         }));
         dispatch(getAllCategoryRequest({
             page: (pageNumber + 1),
